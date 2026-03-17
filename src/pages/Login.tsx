@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React from "react";
 import { useAuth } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useLogin } from "../hooks/useLogin";
 import { motion } from "framer-motion";
 import z from "zod";
@@ -8,6 +8,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { p } from "framer-motion/client";
 import toast from "react-hot-toast";
+import { getErrorMessage } from "../utils/toastError";
+import Loader from "../components/ui/Loader";
+import { getCurrentUser } from "../api/Auth/userApi";
 
 const schema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -22,6 +25,12 @@ function Login() {
 
   const { mutate, isPending } = useLogin();
 
+  const { user } = useAuth();
+
+  if (user) {
+    return <Navigate to="/" replace />;
+  }
+
   const {
     register,
     handleSubmit,
@@ -34,12 +43,19 @@ function Login() {
     mutate(data, {
       onSuccess: (res) => {
         login(res.token);
+
+        // try {
+        //   const userData = await getCurrentUser()
+
+        //   setUser()
+        // } catch {
+
+        // }
+
         navigate("/");
       },
       onError: (error: any) => {
-        const message =
-          error?.response?.data?.message || "Something went wrong";
-        toast.error(message);
+        toast.error(getErrorMessage(error));
       },
     });
   };
@@ -114,14 +130,17 @@ function Login() {
 
             <button
               disabled={isPending}
-              className="w-full py-2 rounded-lg bg-mehfil-primary text-white font-medium hover:opacity-90 transition"
+              className="w-full py-2 rounded-lg bg-mehfil-primary text-white font-medium hover:opacity-90 transition flex items-center justify-center"
             >
-              {isPending ? "Logging in..." : "Login"}
+              {isPending ? <Loader /> : "Login"}
             </button>
 
             <p className="text-sm text-gray-500 mt-6 text-center">
               Don't have an account?{" "}
-              <span className="text-mehfil-primary ml-1 cursor-pointer">
+              <span
+                className="text-mehfil-primary ml-1 cursor-pointer"
+                onClick={() => navigate("/register")}
+              >
                 Sign up
               </span>
             </p>

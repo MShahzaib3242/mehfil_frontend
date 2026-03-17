@@ -3,12 +3,17 @@ import PostComposer from "./PostComposer";
 import { motion } from "framer-motion";
 import PostCard from "./PostCard";
 import { useFeed } from "../hooks/useFeed";
+import Loader from "./ui/Loader";
 
 function FeedContainer() {
   const { data, isLoading, isError } = useFeed();
 
   if (isLoading) {
-    return <div className="text-sm text-gray-500">Loading Feed...</div>;
+    return (
+      <div className="flex justify-center mt-10">
+        <Loader size={24} />
+      </div>
+    );
   }
 
   if (isError) {

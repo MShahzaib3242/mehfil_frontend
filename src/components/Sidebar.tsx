@@ -1,14 +1,20 @@
 import { motion } from "framer-motion";
 import { Bell, Compass, Home, LogOut, SquarePen, User } from "lucide-react";
 import React from "react";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import ProfileDropdown from "./ProfileDropdown";
 
 function Sidebar() {
-  const user = {
-    name: "Shahzaib Chand",
-    username: "shahzaib077",
-    email: "m.shahzaib3242@gmail.com",
-    avatar: "https://i.pravatar.cc/150?img=5",
-  };
+  // const user = {
+  //   name: "Shahzaib Chand",
+  //   username: "shahzaib077",
+  //   email: "m.shahzaib3242@gmail.com",
+  //   avatar: "https://i.pravatar.cc/150?img=5",
+  // };
+
+  // const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   return (
     <div className="flex flex-col justify-between h-full">
@@ -26,22 +32,8 @@ function Sidebar() {
       </div>
 
       {/* Profile Section  */}
-      <div className="border-t pt-4">
-        <div className="flex gap-3 items-center mb-3">
-          <img
-            src={user.avatar}
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <div className="text-sm">
-            <div className="font-semibold">{user.name}</div>
-            <div className="text-gray-500 text-xs">@{user.username}</div>
-          </div>
-        </div>
-        <div className="text-xs text-gray-500 mb-3">{user.email}</div>
-        <button className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600">
-          <LogOut size={16} />
-          Logout
-        </button>
+      <div className="mt-auto border-t pt-4 flex items-center justify-between">
+        <ProfileDropdown />
       </div>
     </div>
   );

@@ -1,26 +1,31 @@
 import React, { createContext, useContext, useState } from "react";
 
 type User = {
-  token: string;
+  _id: string;
+  name: string;
+  username: string;
+  email: string;
+  avatar?: string;
+  bio?: string;
 } | null;
 
 type AuthContextType = {
   user: User;
+  setUser: (user: User) => void;
   login: (token: string) => void;
   logout: () => void;
+  isAuthLoading: boolean;
+  setAuthLoading: (val: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<User>(() => {
-    const token = localStorage.getItem("token");
-    return token ? { token } : null;
-  });
+  const [user, setUser] = useState<User>(null);
+  const [isAuthLoading, setAuthLoading] = useState(true);
 
   const login = (token: string) => {
     localStorage.setItem("token", token);
-    setUser({ token });
   };
 
   const logout = () => {
@@ -29,7 +34,9 @@ export const AuthProvider = ({ children }: any) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, setUser, login, logout, isAuthLoading, setAuthLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
