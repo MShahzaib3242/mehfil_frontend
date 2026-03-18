@@ -12,6 +12,7 @@ import useRegister from "../hooks/useRegister";
 import Loader from "../components/ui/Loader";
 import { useCheckUsername } from "../hooks/useCheckUsername";
 import Input from "../components/ui/Input";
+import { getCurrentUser } from "../api/Auth/userApi";
 
 const schema = z
   .object({
@@ -30,7 +31,7 @@ type FormData = z.infer<typeof schema>;
 
 function Register() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { mutate, isPending } = useRegister();
   const { status, debouncedCheck } = useCheckUsername();
   const { login } = useAuth();
@@ -67,9 +68,13 @@ function Register() {
         password: data.password,
       },
       {
-        onSuccess: (res) => {
+        onSuccess: async (res) => {
           //Auto Login
           login(res.token);
+
+          const userData = await getCurrentUser();
+
+          setUser(userData);
 
           toast.success("Welcome to Mehfil 🎉");
           navigate("/");

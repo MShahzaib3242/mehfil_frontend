@@ -7,9 +7,9 @@ type Props = {
 };
 
 function ProtectedRoute({ children }: Props) {
-  const { user } = useAuth();
+  const token = localStorage.getItem("token");
 
-  if (!user) {
+  if (!token) {
     return <Navigate to="/login" replace />;
   }
   return children;

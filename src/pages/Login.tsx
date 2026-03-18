@@ -20,14 +20,14 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 function Login() {
-  const { login } = useAuth();
+  const { login, setUser } = useAuth();
   const navigate = useNavigate();
 
   const { mutate, isPending } = useLogin();
 
-  const { user } = useAuth();
+  const token = localStorage.getItem("token");
 
-  if (user) {
+  if (token) {
     return <Navigate to="/" replace />;
   }
 
@@ -41,18 +41,18 @@ function Login() {
 
   const onSubmit = (data: FormData) => {
     mutate(data, {
-      onSuccess: (res) => {
+      onSuccess: async (res) => {
         login(res.token);
 
-        // try {
-        //   const userData = await getCurrentUser()
+        try {
+          const userData = await getCurrentUser();
 
-        //   setUser()
-        // } catch {
+          setUser(userData);
 
-        // }
-
-        navigate("/");
+          navigate("/");
+        } catch (err) {
+          toast.error("Failed to load user");
+        }
       },
       onError: (error: any) => {
         toast.error(getErrorMessage(error));

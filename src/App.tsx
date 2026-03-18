@@ -7,28 +7,16 @@ import { useCurrentUser } from "./hooks/useCurrentUser";
 import { useAuth } from "./context/AuthContext";
 import React from "react";
 import Profile from "./pages/Profile";
-import Loader from "./components/ui/Loader";
 
 function App() {
-  const { data, isLoading } = useCurrentUser();
-  const { setUser, setAuthLoading, isAuthLoading } = useAuth();
+  const { data } = useCurrentUser();
+  const { setUser } = useAuth();
 
   React.useEffect(() => {
-    if (!isLoading) {
-      if (data) {
-        setUser(data);
-      }
-      setAuthLoading(false);
+    if (data) {
+      setUser(data);
     }
-  }, [data, isLoading]);
-
-  if (isAuthLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader size={30} />
-      </div>
-    );
-  }
+  }, [data]);
 
   return (
     <BrowserRouter>
