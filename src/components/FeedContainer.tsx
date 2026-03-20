@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import PostCard from "./PostCard";
 import { useFeed } from "../hooks/useFeed";
 import Loader from "./ui/Loader";
+import SuggestedUsers from "./SuggestedUsers";
 
 function FeedContainer() {
   const { data, isLoading, isError } = useFeed();
@@ -20,27 +21,19 @@ function FeedContainer() {
     return <div className="text-red-500">Failed to laod feed</div>;
   }
 
-  const mockPosts = [
-    {
-      id: 1,
-      username: "Shahzaib Chand",
-      avatar: "https://i.pravatar.cc/150?img=1",
-      content: "AI is transforming backend development",
-    },
-    {
-      id: 2,
-      username: "Sara Dev",
-      avatar: "https://i.pravatar.cc/150?img=2",
-      content: "Beautiful sunset today.",
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
-    },
-    {
-      id: 3,
-      username: "John Doe",
-      avatar: "https://i.pravatar.cc/150?img=3",
-      content: "Working on Mehfil UI today. Loving the compact feed idea.",
-    },
-  ];
+  if (!data?.hasFollowing) {
+    return (
+      <>
+        <PostComposer />
+
+        <div className="flex flex-col gap-4">
+          {data?.posts.map((post: any) => (
+            <PostCard key={post._id} {...post} />
+          ))}
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className="w-full">
@@ -56,12 +49,7 @@ function FeedContainer() {
               delay: index * 0.05,
             }}
           >
-            <PostCard
-              username={post.author.username}
-              avatar={post.author.avatar || "https://i.pravatar.cc/150"}
-              content={post.content}
-              image={post.image}
-            />
+            <PostCard post={post} />
           </motion.div>
         ))}
       </div>

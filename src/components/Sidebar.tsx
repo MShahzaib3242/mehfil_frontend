@@ -17,13 +17,15 @@ function Sidebar() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col justify-between h-full">
-      <div>
+    <div className="flex flex-col h-screen">
+      <div className="flex flex-col gap-4 p-4">
         {/* Logo  */}
-        <h1 className="text-2xl font-bold mb-8 text-mehfil-primary">Mehfil</h1>
+        <h1 className="text-2xl font-bold text-mehfil-primary text-center">
+          Mehfil
+        </h1>
 
         {/* Navigation  */}
-        <nav className="space-y-1">
+        <nav className="flex flex-col gap-2">
           <NavItem icon={<Home size={18} />} label="Home" />
           <NavItem icon={<Compass size={18} />} label="Explore" />
           <NavItem icon={<Bell size={18} />} label="Notifications" />
@@ -32,7 +34,7 @@ function Sidebar() {
       </div>
 
       {/* Profile Section  */}
-      <div className="mt-auto border-t pt-4 flex items-center justify-between">
+      <div className="mt-auto border-t p-4 flex items-center justify-between">
         <ProfileDropdown />
       </div>
     </div>

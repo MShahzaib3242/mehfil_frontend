@@ -3,7 +3,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Register from "./pages/Register";
-import { useCurrentUser } from "./hooks/useCurrentUser";
+import { useCurrentUser } from "./hooks/User/useCurrentUser";
 import { useAuth } from "./context/AuthContext";
 import React from "react";
 import Profile from "./pages/Profile";

@@ -25,12 +25,6 @@ function Login() {
 
   const { mutate, isPending } = useLogin();
 
-  const token = localStorage.getItem("token");
-
-  if (token) {
-    return <Navigate to="/" replace />;
-  }
-
   const {
     register,
     handleSubmit,
@@ -38,6 +32,12 @@ function Login() {
   } = useForm<FormData>({
     resolver: zodResolver(schema),
   });
+
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    return <Navigate to="/" replace />;
+  }
 
   const onSubmit = (data: FormData) => {
     mutate(data, {
