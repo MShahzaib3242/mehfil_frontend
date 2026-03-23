@@ -30,7 +30,7 @@ function ProfileDropdown() {
         onClick={() => setOpen(!open)}
       >
         <img
-          src={user?.avatar || "https://i.pravatar.cc/150"}
+          src={user?.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
           className="w-10 h-10 rounded-full"
         />
         <div>

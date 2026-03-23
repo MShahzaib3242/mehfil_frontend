@@ -5,7 +5,7 @@ export const getUserPosts = async (userId: string) => {
   return res.data;
 };
 
-export const createPost = async (data: { content: string; image?: string }) => {
+export const createPost = async (data: FormData) => {
   const res = await api.post("/posts", data);
   return res.data;
 };

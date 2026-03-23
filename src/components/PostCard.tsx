@@ -4,13 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "../context/AuthContext";
 import { useDeletePost, useUpdatePost } from "../hooks/Posts/usePostActions";
 import ConfirmDialog from "./ui/ConfirmDialog";
-
-type Props = {
-  username: string;
-  avatar?: string;
-  content: string;
-  image?: string;
-};
+import Loader from "./ui/Loader";
+import toast from "react-hot-toast";
 
 function PostCard(post: any) {
   const { user } = useAuth();
@@ -19,10 +14,68 @@ function PostCard(post: any) {
   const [content, setContent] = React.useState(post.content);
   const [showConfirm, setShowConfirm] = React.useState(false);
 
+  const [existingImages, setExistingImages] = React.useState<string[]>(
+    post.images || [],
+  );
+  const [newImages, setNewImages] = React.useState<File[]>([]);
+  const [newPreviews, setNewPreviews] = React.useState<string[]>([]);
+
   const { mutate: deleteMutate } = useDeletePost();
-  const { mutate: updateMutate } = useUpdatePost();
+  const { mutate: updateMutate, isPending: isUpdating } = useUpdatePost();
 
   const isOwner = user?._id === post.author?._id;
+
+  const handleEditStart = () => {
+    setIsEditing(true);
+    setOpen(false);
+    setContent(post.content || "");
+
+    setExistingImages(post.images || []);
+    setNewImages([]);
+    setNewPreviews([]);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []) as File[];
+
+    if (!files.length) return;
+
+    setNewImages((prev) => [...prev, ...files]);
+
+    const previews = files.map((file) => URL.createObjectURL(file));
+
+    setNewPreviews((prev) => [...prev, ...previews]);
+  };
+
+  const handleUpdatePost = () => {
+    const formData = new FormData();
+
+    formData.append("content", content);
+
+    const uniqueExisting = Array.from(new Set(existingImages));
+
+    formData.append("existingImages", JSON.stringify(uniqueExisting));
+
+    newImages.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    updateMutate(
+      { id: post._id, data: formData },
+      {
+        onSuccess: () => {
+          toast.success("Post updated successfully");
+
+          setIsEditing(false);
+          setNewImages([]);
+          setNewPreviews([]);
+        },
+        onError: () => {
+          toast.error("Failed to update Post.");
+        },
+      },
+    );
+  };
 
   return (
     <>
@@ -47,10 +100,7 @@ function PostCard(post: any) {
                     className="absolute right-0 mt-2 w-32 bg-white border rounded-lg shadow-md z-50"
                   >
                     <button
-                      onClick={() => {
-                        setIsEditing(true);
-                        setOpen(false);
-                      }}
+                      onClick={handleEditStart}
                       className="block w-full text-left px-3 py-2 text-sm hover:bg-gray-100"
                     >
                       Edit
@@ -72,14 +122,14 @@ function PostCard(post: any) {
         </div>
         {/* Avatar */}
         <img
-          src={post.avatar || "https://i.pravatar.cc/150"}
+          src={post.author.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
           className="w-9 h-9 rounded-full object-cover"
         />
 
         {/* Post Content */}
         <div className="flex-1">
           <div className="flex items-center gap-2 text-sm mb-1">
-            <span className="font-semibold">{post.username}</span>
+            <span className="font-semibold">{post.author.username}</span>
             <span className="text-gray-500">• 2h</span>
           </div>
 
@@ -99,13 +149,10 @@ function PostCard(post: any) {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    updateMutate({ id: post._id, data: { content } });
-                    setIsEditing(false);
-                  }}
+                  onClick={handleUpdatePost}
                   className="text-sm px-3 py-1 bg-mehfil-primary text-white rounded"
                 >
-                  Save
+                  {isUpdating ? <Loader /> : "Save"}
                 </button>
               </div>
             </div>
@@ -115,11 +162,74 @@ function PostCard(post: any) {
             </p>
           )}
 
-          {post.image && (
-            <img
-              src={post.image}
-              className="mt-3 rounded-lg max-h-56 w-full object-cover"
-            />
+          {existingImages?.length > 0 && (
+            <div
+              className={`grid ${isEditing ? "grid-cols-5" : "grid-cols-2"} gap-2 mt-3`}
+            >
+              {existingImages.map((img: string, i: number) => (
+                <div key={i} className="relative">
+                  <img
+                    src={img}
+                    className={` rounded-lg object-cover ${isEditing ? "h-20 w-20" : "h-auto w-full"}`}
+                  />
+                  {isEditing && (
+                    <button
+                      onClick={() =>
+                        setExistingImages((prev) =>
+                          prev.filter((_, idx) => idx !== i),
+                        )
+                      }
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                    >
+                      x
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {newPreviews.length > 0 && (
+            <div
+              className={`grid ${isEditing ? "grid-cols-5" : "grid-cols-2"} gap-2 mt-3`}
+            >
+              {newPreviews.map((src, i) => (
+                <div key={i} className="relative">
+                  <img
+                    src={src}
+                    alt=""
+                    className={`rounded-lg object-cover ${isEditing ? "h-20 w-20" : "h-auto w-full"}`}
+                  />
+
+                  <button
+                    onClick={() => {
+                      setNewImages((prev) =>
+                        prev.filter((_, idx) => idx !== i),
+                      );
+                      setNewPreviews((prev) =>
+                        prev.filter((_, idx) => idx !== i),
+                      );
+                    }}
+                    className="absolute top-1 right-1 bg-black/60 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center"
+                  >
+                    x
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {isEditing && (
+            <label className="cursor-pointer text-sm text-mehfil-primary mt-2 block">
+              + Add Image
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+            </label>
           )}
 
           <div className="flex gap-6 mt-3 text-gray-500 text-sm">

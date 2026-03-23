@@ -8,6 +8,7 @@ import Loader from "../components/ui/Loader";
 import PostCard from "../components/PostCard";
 import { useUpdateProfile } from "../hooks/User/useUpdateProfile";
 import toast from "react-hot-toast";
+import PostComposer from "../components/PostComposer";
 
 function Profile() {
   const { user, setUser } = useAuth();
@@ -101,7 +102,7 @@ function Profile() {
           <div className="flex justify-between items-start">
             <div className="w-auto">
               <img
-                src={form.avatar || "https://i.pravatar.cc/150"}
+                src={form.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
                 alt="User Avatar"
                 className="w-20 h-20 rounded-lg object-cover"
               />
@@ -213,22 +214,43 @@ function Profile() {
             </div>
           </div>
         </motion.div>
-        <div className="mt-6 bg-white border rounded-xl p-3 flex gap-6 text-sm">
+        <div className="mt-4 bg-white border rounded-xl p-3 flex gap-6 text-sm">
           <button className="font-medium border-b-2 border-mehfil-primary pb-1">
             Posts
           </button>
           <button className="text-gray-500 hover:text-black">Likes</button>
         </div>
-        {/* CONTENT PLACEHOLDER  */}
-        <div className="mt-4 overflow-hidden flex flex-col gap-4">
+        <div className="mt-4 flex flex-col gap-4">
+          <PostComposer />
+
+          {/* CONTENT PLACEHOLDER  */}
           {isLoading && (
             <div className="flex justify-center p-6">
               <Loader />
             </div>
           )}
-          {data?.posts?.map((post: any) => (
-            <PostCard key={post._id} {...post} />
-          ))}
+          {!isLoading &&
+            data?.posts.length > 0 &&
+            data?.posts?.map((post: any) => (
+              <PostCard key={post._id} {...post} />
+            ))}
+
+          {!isLoading && (!data?.posts || data?.posts.length === 0) && (
+            <div className="bg-white border rounded-xl p-8 text-center">
+              <p className="text-gray-500 text-sm mb-4">
+                You haven't posted anything yet
+              </p>
+
+              <button
+                onClick={() => {
+                  document.getElementById("post-input")?.focus();
+                }}
+                className="px-4 py-2 text-sm bg-mehfil-primary text-white rounded-lg hover:opacity-90 transition"
+              >
+                Create First Post
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </MainLayout>

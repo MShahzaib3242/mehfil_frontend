@@ -11,6 +11,8 @@ import toast from "react-hot-toast";
 import { getErrorMessage } from "../utils/toastError";
 import Loader from "../components/ui/Loader";
 import { getCurrentUser } from "../api/Auth/userApi";
+import { GoogleLogin } from "@react-oauth/google";
+import api from "../api/api";
 
 const schema = z.object({
   email: z.string().email("Please enter a valid email"),
@@ -58,6 +60,23 @@ function Login() {
         toast.error(getErrorMessage(error));
       },
     });
+  };
+
+  const handleGoogleLogin = async (response: any) => {
+    try {
+      const res = await api.post("/auth/google", {
+        credential: response.credential,
+      });
+
+      login(res.data.token);
+
+      const userData = await getCurrentUser();
+      setUser(userData);
+
+      navigate("/");
+    } catch (err) {
+      toast.error("Google Login Failed");
+    }
   };
 
   return (
@@ -145,6 +164,14 @@ function Login() {
               </span>
             </p>
           </form>
+          <GoogleLogin
+            onSuccess={(credentialResponse) => {
+              handleGoogleLogin(credentialResponse);
+            }}
+            onError={() => {
+              toast.error("Google Login Failed");
+            }}
+          />
         </motion.div>
       </div>
     </div>

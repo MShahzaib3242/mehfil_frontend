@@ -6,13 +6,6 @@ import { useNavigate } from "react-router-dom";
 import ProfileDropdown from "./ProfileDropdown";
 
 function Sidebar() {
-  // const user = {
-  //   name: "Shahzaib Chand",
-  //   username: "shahzaib077",
-  //   email: "m.shahzaib3242@gmail.com",
-  //   avatar: "https://i.pravatar.cc/150?img=5",
-  // };
-
   // const { user, logout } = useAuth();
   const navigate = useNavigate();
 
