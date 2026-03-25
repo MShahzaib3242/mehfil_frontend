@@ -6,6 +6,7 @@ import { useDeletePost, useUpdatePost } from "../hooks/Posts/usePostActions";
 import ConfirmDialog from "./ui/ConfirmDialog";
 import Loader from "./ui/Loader";
 import toast from "react-hot-toast";
+import { useToggleLike } from "../hooks/Impressions/useToggleLike";
 
 function PostCard(post: any) {
   const { user } = useAuth();
@@ -22,8 +23,13 @@ function PostCard(post: any) {
 
   const { mutate: deleteMutate } = useDeletePost();
   const { mutate: updateMutate, isPending: isUpdating } = useUpdatePost();
+  const { mutate: toggleLikeMutate } = useToggleLike();
 
   const isOwner = user?._id === post.author?._id;
+
+  React.useEffect(() => {
+    setExistingImages(post.images || []);
+  }, [post.images]);
 
   const handleEditStart = () => {
     setIsEditing(true);
@@ -233,8 +239,15 @@ function PostCard(post: any) {
           )}
 
           <div className="flex gap-6 mt-3 text-gray-500 text-sm">
-            <span className="flex items-center gap-1 hover:text-red-500 cursor-pointer">
-              <Heart size={16} /> 24
+            <span
+              className={`flex items-center gap-1 hover:text-red-500 cursor-pointer ${post.isLiked ? "text-red-500" : "text-gray-500"}`}
+            >
+              <Heart
+                size={16}
+                fill={post.isLiked ? "red" : "none"}
+                className="transition-all duration-200 hover:scale-110 active:scale-95"
+              />{" "}
+              {post.likesCount || 0}
             </span>
 
             <span className="flex items-center gap-1 hover:text-blue-500 cursor-pointer">

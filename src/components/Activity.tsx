@@ -3,7 +3,7 @@ import SuggestedUsers from "./SuggestedUsers";
 
 function Activity() {
   return (
-    <div className="flex flex-col gap-6 h-screen pt-4 pr-4">
+    <div className="flex flex-col gap-4 h-screen pt-4 pr-4">
       <SuggestedUsers />
 
       <div className="bg-white border rounded-2xl p-4 shadow-sm">

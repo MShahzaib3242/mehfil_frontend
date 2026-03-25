@@ -1,18 +1,30 @@
 import React from "react";
-import api from "../api/api";
-import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-
-const fetchSuggestedUsers = async () => {
-  const res = await api.get("/users/suggested");
-  return res.data;
-};
+import { AnimatePresence, motion } from "framer-motion";
+import { useSuggestedUsers } from "../hooks/User/useSuggestedUsers";
+import { useToggleFollow } from "../hooks/Impressions/useToggleFollow";
 
 function SuggestedUsers() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["suggestedUsers"],
-    queryFn: fetchSuggestedUsers,
-  });
+  const { data, isLoading } = useSuggestedUsers();
+  const { mutate: toggleFollow, isPending } = useToggleFollow();
+  const [openUserId, setOpenUserId] = React.useState<string | null>(null);
+  const popoverRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        popoverRef.current &&
+        !popoverRef.current.contains(event.target as Node)
+      ) {
+        setOpenUserId(null);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div className="bg-white border rounded-2xl p-4 shadow-sm">
@@ -26,7 +38,9 @@ function SuggestedUsers() {
 
       {/* Empty  */}
       {!isLoading && data?.length === 0 && (
-        <div className="text-sm text-gray-400">No Suggestions Available</div>
+        <div className="text-sm text-gray-400">
+          You're following everyone 🎉
+        </div>
       )}
 
       {/* USERS LIST  */}
@@ -48,10 +62,51 @@ function SuggestedUsers() {
               </div>
             </div>
 
-            {/* FOLLOW BUTTON  */}
-            <button className="text-xs px-3 py-1.5 bg-mehfil-primary text-white rounded-full hover:opacity-90 transition">
-              Follow
-            </button>
+            <div className="relative flex items-center justify-between">
+              {/* FOLLOW BUTTON  */}
+              <button
+                onClick={() =>
+                  user.isFollowing
+                    ? setOpenUserId((prev) =>
+                        prev === user._id ? null : user._id,
+                      )
+                    : toggleFollow({
+                        userId: user._id,
+                        isFollowing: false,
+                      })
+                }
+                className={`text-xs px-3 py-1.5 rounded-full hover:opacity-90 transition ${user.isFollowing ? "bg-mehfil-primary text-white" : "border border-mehfil-primary text-mehfil-primary"}`}
+                disabled={isPending}
+              >
+                {user.isFollowing ? "Following" : "Follow"}
+              </button>
+              <AnimatePresence>
+                {openUserId === user._id && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -5, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-10 bg-white border rounded-lg shadow-md p-2 z-50 w-36"
+                    ref={popoverRef}
+                  >
+                    <button className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-sm rounded-md">
+                      View Profile
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        toggleFollow({ userId: user._id, isFollowing: true });
+                        setOpenUserId(null);
+                      }}
+                      className="block w-full text-left px-3 py-1 text-red-500 hover:bg-red-50 text-sm rounded-md"
+                    >
+                      Unfollow
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
         ))}
       </div>

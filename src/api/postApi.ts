@@ -19,3 +19,8 @@ export const updatePost = async (id: string, data: any) => {
   const res = await api.put(`/posts/${id}`, data);
   return res.data;
 };
+
+export const toggleLike = async (postId: string) => {
+  const res = await api.post(`/posts/${postId}/like`);
+  return res.data;
+};

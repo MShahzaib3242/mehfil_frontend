@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deletePost, updatePost } from "../../api/postApi";
+import { deletePost, toggleLike, updatePost } from "../../api/postApi";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
@@ -35,7 +35,17 @@ export const useUpdatePost = () => {
 
   return useMutation({
     mutationFn: ({ id, data }: any) => updatePost(id, data),
-    onSuccess: () => {
+    onSuccess: (updatedPost) => {
+      queryClient.setQueryData(["feed"], (old: any) => {
+        if (!old) return old;
+        return {
+          ...old,
+          posts: old.posts.map((post: any) =>
+            post._id === updatedPost._id ? updatedPost : post,
+          ),
+        };
+      });
+
       queryClient.invalidateQueries({ queryKey: ["feed"] });
     },
   });

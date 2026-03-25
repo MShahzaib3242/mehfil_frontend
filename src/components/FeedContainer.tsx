@@ -39,19 +39,63 @@ function FeedContainer() {
     <div className="w-full">
       <PostComposer />
       <div className="bg-white border rounded-xl overflow-hidden">
-        {data?.posts?.map((post: any, index: number) => (
+        {data?.posts?.length > 0 ? (
+          data?.posts?.map((post: any, index: number) => (
+            <motion.div
+              key={post._id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.25,
+                delay: index * 0.05,
+              }}
+            >
+              <PostCard post={post} />
+            </motion.div>
+          ))
+        ) : (
           <motion.div
-            key={post._id}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.25,
-              delay: index * 0.05,
-            }}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col items-center justify-center py-16 gap-4"
           >
-            <PostCard post={post} />
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{
+                type: "spring",
+                stiffness: 200,
+                damping: 10,
+              }}
+              className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center "
+            >
+              <motion.svg
+                viewBox="0 0 24 24"
+                className={"w-8 h-8 text-green-600"}
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                initial={{ pathLength: 0 }}
+                animate={{ pathLength: 1 }}
+                transition={{ duration: 0.4, ease: "easeInOut" }}
+              >
+                <motion.path d="M5 13l4 4L19 7" />
+              </motion.svg>
+            </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+              className="text-sm text-gray-500"
+            >
+              You all caught up for today 🎉
+            </motion.p>
           </motion.div>
-        ))}
+        )}
       </div>
     </div>
   );
