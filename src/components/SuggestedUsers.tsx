@@ -2,12 +2,14 @@ import React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useSuggestedUsers } from "../hooks/User/useSuggestedUsers";
 import { useToggleFollow } from "../hooks/Impressions/useToggleFollow";
+import { useNavigate } from "react-router-dom";
 
 function SuggestedUsers() {
   const { data, isLoading } = useSuggestedUsers();
   const { mutate: toggleFollow, isPending } = useToggleFollow();
   const [openUserId, setOpenUserId] = React.useState<string | null>(null);
   const popoverRef = React.useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -90,7 +92,10 @@ function SuggestedUsers() {
                     className="absolute right-0 top-10 bg-white border rounded-lg shadow-md p-2 z-50 w-36"
                     ref={popoverRef}
                   >
-                    <button className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-sm rounded-md">
+                    <button
+                      onClick={() => navigate(`/user/${user._id}`)}
+                      className="block w-full text-left px-3 py-1 hover:bg-gray-100 text-sm rounded-md"
+                    >
                       View Profile
                     </button>
 

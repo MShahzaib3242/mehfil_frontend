@@ -8,10 +8,12 @@ import Loader from "./ui/Loader";
 import toast from "react-hot-toast";
 import { useToggleLike } from "../hooks/Impressions/useToggleLike";
 
-function PostCard(post: any) {
+function PostCard({ post }: any) {
   const { user } = useAuth();
   const [open, setOpen] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
+  const [showHeart, setShowHeart] = React.useState(false);
+
   const [content, setContent] = React.useState(post.content);
   const [showConfirm, setShowConfirm] = React.useState(false);
 
@@ -88,7 +90,7 @@ function PostCard(post: any) {
       <motion.div
         whileHover={{ scale: 1.01 }}
         transition={{ duration: 0.15 }}
-        className="flex gap-3 p-4 border-b cursor-pointer bg-white border shadow-sm rounded-2xl relative"
+        className="flex gap-3 p-4 border-b cursor-pointer bg-white border shadow-sm rounded-2xl relative overflow-hidden"
       >
         <div className="absolute top-3 right-3">
           {isOwner && (
@@ -128,14 +130,14 @@ function PostCard(post: any) {
         </div>
         {/* Avatar */}
         <img
-          src={post.author.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
+          src={post?.author?.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
           className="w-9 h-9 rounded-full object-cover"
         />
 
         {/* Post Content */}
         <div className="flex-1">
           <div className="flex items-center gap-2 text-sm mb-1">
-            <span className="font-semibold">{post.author.username}</span>
+            <span className="font-semibold">{post?.author?.username}</span>
             <span className="text-gray-500">• 2h</span>
           </div>
 
@@ -240,6 +242,17 @@ function PostCard(post: any) {
 
           <div className="flex gap-6 mt-3 text-gray-500 text-sm">
             <span
+              onClick={() => {
+                toggleLikeMutate(post._id);
+
+                if (!post.isLiked) {
+                  setShowHeart(true);
+
+                  setTimeout(() => {
+                    setShowHeart(false);
+                  }, 600);
+                }
+              }}
               className={`flex items-center gap-1 hover:text-red-500 cursor-pointer ${post.isLiked ? "text-red-500" : "text-gray-500"}`}
             >
               <Heart
@@ -255,6 +268,25 @@ function PostCard(post: any) {
             </span>
           </div>
         </div>
+        <AnimatePresence>
+          {showHeart && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1.8, opacity: 1 }}
+              exit={{ scale: 2.2, opacity: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
+            >
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                <Heart size={80} fill="red" className="text-red-500" />
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.div>
       <ConfirmDialog
         open={showConfirm}

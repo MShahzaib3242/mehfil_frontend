@@ -7,6 +7,7 @@ import { useCurrentUser } from "./hooks/User/useCurrentUser";
 import { useAuth } from "./context/AuthContext";
 import React from "react";
 import Profile from "./pages/Profile";
+import UserProfile from "./pages/UserProfile";
 
 function App() {
   const { data } = useCurrentUser();
@@ -36,6 +37,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/user/:id"
+          element={
+            <ProtectedRoute>
+              <UserProfile />
             </ProtectedRoute>
           }
         />

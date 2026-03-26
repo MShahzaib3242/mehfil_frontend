@@ -230,9 +230,9 @@ function Profile() {
             </div>
           )}
           {!isLoading &&
-            data?.posts.length > 0 &&
+            data?.posts?.length > 0 &&
             data?.posts?.map((post: any) => (
-              <PostCard key={post._id} {...post} />
+              <PostCard key={post._id} post={post} />
             ))}
 
           {!isLoading && (!data?.posts || data?.posts.length === 0) && (
