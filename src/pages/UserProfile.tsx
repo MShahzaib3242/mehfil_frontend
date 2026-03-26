@@ -75,7 +75,7 @@ function UserProfile() {
 
           <div className="flex gap-6 mt-6 text-sm">
             <div>
-              <span className="font-semibold">{data?.posts?.length || 0}</span>
+              <span className="font-semibold">{data?.length || 0}</span>
               <span className="text-gray-500 ml-1">Posts</span>
             </div>
             <div>

@@ -7,12 +7,16 @@ import ConfirmDialog from "./ui/ConfirmDialog";
 import Loader from "./ui/Loader";
 import toast from "react-hot-toast";
 import { useToggleLike } from "../hooks/Impressions/useToggleLike";
+import CommentSection from "./CommentSection";
+import { useNavigate } from "react-router-dom";
 
 function PostCard({ post }: any) {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [open, setOpen] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
   const [showHeart, setShowHeart] = React.useState(false);
+  const [showComments, setShowComments] = React.useState(false);
 
   const [content, setContent] = React.useState(post.content);
   const [showConfirm, setShowConfirm] = React.useState(false);
@@ -87,11 +91,7 @@ function PostCard({ post }: any) {
 
   return (
     <>
-      <motion.div
-        whileHover={{ scale: 1.01 }}
-        transition={{ duration: 0.15 }}
-        className="flex gap-3 p-4 border-b cursor-pointer bg-white border shadow-sm rounded-2xl relative overflow-hidden"
-      >
+      <motion.div className="flex gap-3 p-4 border-b bg-white border shadow-sm rounded-2xl relative overflow-hidden">
         <div className="absolute top-3 right-3">
           {isOwner && (
             <div className="relative">
@@ -130,14 +130,20 @@ function PostCard({ post }: any) {
         </div>
         {/* Avatar */}
         <img
+          onClick={() => navigate(`/user/${post?.author?._id}`)}
           src={post?.author?.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
           className="w-9 h-9 rounded-full object-cover"
         />
 
         {/* Post Content */}
         <div className="flex-1">
-          <div className="flex items-center gap-2 text-sm mb-1">
-            <span className="font-semibold">{post?.author?.username}</span>
+          <div
+            className="flex items-center gap-2 text-sm mb-1 cursor-pointer"
+            onClick={() => navigate(`/user/${post?.author?._id}`)}
+          >
+            <span className="font-semibold hover:underline">
+              {post?.author?.username}
+            </span>
             <span className="text-gray-500">• 2h</span>
           </div>
 
@@ -263,11 +269,18 @@ function PostCard({ post }: any) {
               {post.likesCount || 0}
             </span>
 
-            <span className="flex items-center gap-1 hover:text-blue-500 cursor-pointer">
-              <MessageCircle size={16} /> 8
+            <span
+              onClick={() => setShowComments((prev) => !prev)}
+              className="flex items-center gap-1 hover:text-blue-500 cursor-pointer"
+            >
+              <MessageCircle size={16} /> {post.commentsCount || 0}
             </span>
           </div>
+          {showComments && (
+            <CommentSection postId={post._id} postAuthorId={post.author?._id} />
+          )}
         </div>
+
         <AnimatePresence>
           {showHeart && (
             <motion.div

@@ -12,8 +12,9 @@ function Sidebar() {
     <div className="flex flex-col h-screen">
       <div className="flex flex-col gap-4 p-4">
         {/* Logo  */}
-        <h1 className="text-2xl font-bold text-mehfil-primary text-center uppercase">
-          Mehfil
+        <h1 className="text-2xl font-bold text-black text-center uppercase">
+          {/* Mehfil */}
+          motifino
         </h1>
 
         {/* Navigation  */}

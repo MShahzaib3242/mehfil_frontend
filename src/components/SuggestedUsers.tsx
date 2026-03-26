@@ -50,10 +50,12 @@ function SuggestedUsers() {
         {data?.map((user: any) => (
           <motion.div
             key={user?._id}
-            whileHover={{ scale: 1.02 }}
             className="flex items-center justify-between p-2 rounded-xl hover:bg-gray-50 transition"
           >
-            <div className="flex items-center gap-3">
+            <div
+              className="flex items-center gap-3 cursor-pointer"
+              onClick={() => navigate(`/user/${user._id}`)}
+            >
               <img
                 src={user.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
                 className="w-10 h-10 rounded-full object-cover"

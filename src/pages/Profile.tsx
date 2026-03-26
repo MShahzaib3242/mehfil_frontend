@@ -201,7 +201,7 @@ function Profile() {
 
           <div className="flex gap-6 mt-6 text-sm">
             <div>
-              <span className="font-semibold">{data?.posts?.length || 0}</span>
+              <span className="font-semibold">{data?.length || 0}</span>
               <span className="text-gray-500 ml-1">Posts</span>
             </div>
             <div>
@@ -230,12 +230,10 @@ function Profile() {
             </div>
           )}
           {!isLoading &&
-            data?.posts?.length > 0 &&
-            data?.posts?.map((post: any) => (
-              <PostCard key={post._id} post={post} />
-            ))}
+            data?.length > 0 &&
+            data?.map((post: any) => <PostCard key={post._id} post={post} />)}
 
-          {!isLoading && (!data?.posts || data?.posts.length === 0) && (
+          {!isLoading && (!data || data?.length === 0) && (
             <div className="bg-white border rounded-xl p-8 text-center">
               <p className="text-gray-500 text-sm mb-4">
                 You haven't posted anything yet
