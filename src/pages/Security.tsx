@@ -4,12 +4,48 @@ import { motion } from "framer-motion";
 import BlockedUsersModal from "../components/BlockedUsersModal";
 import { useDeactivateAccount } from "../hooks/User/useDeactivateAccount";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
+import { useChangePassword } from "../hooks/User/useChangePassword";
+import z from "zod";
+import Input from "../components/ui/Input";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import Loader from "../components/ui/Loader";
+
+const schema = z
+  .object({
+    oldPassword: z.string().min(6, "Old password is required"),
+    newPassword: z.string().min(6, "Minimum 6 characters"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.newPassword === data.confirmPassword, {
+    message: "Password did not match.",
+    path: ["confirmPassword"],
+  });
+
+type FormData = z.infer<typeof schema>;
 
 function Security() {
   const [openBlocked, setOpenBlocked] = React.useState(false);
 
   const [confirmDeactivate, setConfirmDeactivate] = React.useState(false);
   const { mutate: deactivate, isPending } = useDeactivateAccount();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormData>({
+    resolver: zodResolver(schema),
+  });
+
+  const { mutate, isPending: changePasswordPending } = useChangePassword();
+
+  const onSubmit = (data: FormData) => {
+    mutate({
+      oldPassword: data.oldPassword,
+      newPassword: data.newPassword,
+    });
+  };
 
   return (
     <MainLayout>
@@ -21,12 +57,36 @@ function Security() {
         >
           <h2 className="text-xl font-semibold mb-4">Security</h2>
 
-          <div className="mb-6 w-full flex flex-col gap-4 items-end">
-            <input placeholder="New Password" className="border p-2 w-full" />
-            <button className=" bg-black text-white px-4 py-2 text-sm rounded-md">
-              Update Password
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="mb-6 w-full flex flex-col gap-3"
+          >
+            <Input
+              type="password"
+              placeholder="Enter your old password"
+              register={register("oldPassword")}
+              error={errors.oldPassword?.message}
+            />
+            <Input
+              type="password"
+              placeholder="Enter New Password"
+              register={register("newPassword")}
+              error={errors.newPassword?.message}
+            />
+            <Input
+              type="password"
+              placeholder="Confirm New Password"
+              register={register("confirmPassword")}
+              error={errors.confirmPassword?.message}
+            />
+            <button
+              type="submit"
+              disabled={changePasswordPending}
+              className="text-center bg-black text-white px-4 py-2 text-sm rounded-md flex items-center justify-center"
+            >
+              {changePasswordPending ? <Loader size={18} /> : "Update Password"}
             </button>
-          </div>
+          </form>
 
           <div className="w-full flex items-center justify-between">
             <button

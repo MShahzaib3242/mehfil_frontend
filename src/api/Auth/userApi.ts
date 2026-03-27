@@ -16,6 +16,13 @@ export const getUserProfile = async (userId: string) => {
   return res.data;
 };
 
+export const changePassword = (data: {
+  oldPassword: string;
+  newPassword: string;
+}) => {
+  return api.post("/users/change-password", data);
+};
+
 export const deactivateAccount = () => {
   return api.post("/users/deactivate");
 };

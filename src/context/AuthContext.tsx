@@ -16,6 +16,8 @@ type AuthContextType = {
   logout: () => void;
   isAuthLoading: boolean;
   setAuthLoading: (val: boolean) => void;
+  passwordUpdated: boolean;
+  setPasswordUpdated: (val: boolean) => void;
   isDeactivated: boolean;
   setIsDeactivated: (val: boolean) => void;
 };
@@ -25,6 +27,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: any) => {
   const [user, setUser] = React.useState<User>(null);
   const [isAuthLoading, setAuthLoading] = React.useState(true);
+  const [passwordUpdated, setPasswordUpdated] = React.useState(false);
   const [isDeactivated, setIsDeactivated] = React.useState(false);
 
   const login = (token: string) => {
@@ -45,6 +48,8 @@ export const AuthProvider = ({ children }: any) => {
         logout,
         isAuthLoading,
         setAuthLoading,
+        passwordUpdated,
+        setPasswordUpdated,
         isDeactivated,
         setIsDeactivated,
       }}

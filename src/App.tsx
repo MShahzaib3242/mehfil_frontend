@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Security from "./pages/Security";
 import DeactivatedModal from "./components/ui/DeactivatedModal";
+import PasswordUpdatedModal from "./components/ui/PasswordUpdatedModal";
 
 function App() {
   const { data } = useCurrentUser();
@@ -23,6 +24,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <PasswordUpdatedModal />
       <DeactivatedModal />
 
       <Routes>

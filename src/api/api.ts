@@ -19,6 +19,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
+    const message = error?.response?.data?.message;
 
     if (status === 401) {
       localStorage.removeItem("token");
@@ -26,8 +27,13 @@ api.interceptors.response.use(
       window.location.href = "/login";
     }
 
-    if (error?.response?.data?.message === "ACCOUNT_DEACTIVATED") {
+    if (message === "ACCOUNT_DEACTIVATED") {
       return Promise.reject(error);
+    }
+
+    if (message === "PASSWORD_CHANGED") {
+      localStorage.removeItem("token");
+      window.location.href = "/login";
     }
 
     if (status === 403) {
