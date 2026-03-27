@@ -1,7 +1,7 @@
 import React from "react";
 import { useAuth } from "../context/AuthContext";
 import MainLayout from "../layouts/MainLayout";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Edit2 } from "lucide-react";
 import { useUserPosts } from "../hooks/Posts/useUserPosts";
 import Loader from "../components/ui/Loader";
@@ -9,12 +9,25 @@ import PostCard from "../components/PostCard";
 import { useUpdateProfile } from "../hooks/User/useUpdateProfile";
 import toast from "react-hot-toast";
 import PostComposer from "../components/PostComposer";
+import { useFollowers } from "../hooks/User/useFollowers";
+import { useFollowing } from "../hooks/User/useFollowing";
+import { useNavigate } from "react-router-dom";
+import UserListModal from "../components/ui/UserListModal";
+import { useToggleFollow } from "../hooks/Impressions/useToggleFollow";
 
 function Profile() {
+  const navigate = useNavigate();
   const { user, setUser } = useAuth();
+  const { mutate: toggleFollow } = useToggleFollow();
   const [isEditing, setIsEditing] = React.useState(false);
   const { data, isLoading } = useUserPosts(user?._id);
   const { mutate, isPending } = useUpdateProfile();
+  const { data: followers = [] } = useFollowers(user?._id || "");
+  const { data: following = [] } = useFollowing(user?._id || "");
+  const [activeTab, setActiveTab] = React.useState<
+    "followers" | "following" | null
+  >(null);
+
   const [form, setForm] = React.useState<{
     name: string;
     username: string;
@@ -204,12 +217,18 @@ function Profile() {
               <span className="font-semibold">{data?.length || 0}</span>
               <span className="text-gray-500 ml-1">Posts</span>
             </div>
-            <div>
-              <span className="font-semibold">340</span>
+            <div
+              className="cursor-pointer"
+              onClick={() => setActiveTab("followers")}
+            >
+              <span className="font-semibold">{followers?.length || 0}</span>
               <span className="text-gray-500 ml-1">Followers</span>
             </div>
-            <div>
-              <span className="font-semibold">180</span>
+            <div
+              className="cursor-pointer"
+              onClick={() => setActiveTab("following")}
+            >
+              <span className="font-semibold">{following?.length || 0}</span>
               <span className="text-gray-500 ml-1">Following</span>
             </div>
           </div>
@@ -251,6 +270,41 @@ function Profile() {
           )}
         </div>
       </div>
+      <UserListModal
+        open={activeTab === "followers"}
+        onClose={() => setActiveTab(null)}
+        title="Followers"
+        data={followers}
+        type="followers"
+        renderAction={(u) => {
+          if (u._id === user?._id) return null;
+          console.log("ui", u.isFollowing);
+          return (
+            <button
+              onClick={() =>
+                toggleFollow({
+                  userId: u._id,
+                  isFollowing: u.isFollowing,
+                })
+              }
+              className={`text-xs px-3 py-1 rounded-full ${
+                u.isFollowing
+                  ? "bg-mehfil-primary text-white"
+                  : "border border-mehfil-primary text-mehfil-primary hover:bg-mehfil-primary hover:text-white"
+              }`}
+            >
+              {u.isFollowing ? "Following" : "Follow"}
+            </button>
+          );
+        }}
+      />
+      <UserListModal
+        open={activeTab === "following"}
+        onClose={() => setActiveTab(null)}
+        title="Following"
+        data={following}
+        type="following"
+      />
     </MainLayout>
   );
 }

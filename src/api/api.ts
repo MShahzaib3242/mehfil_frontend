@@ -1,4 +1,5 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
@@ -17,10 +18,18 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
+    const status = error?.response?.status;
+
+    if (status === 401) {
       localStorage.removeItem("token");
 
       window.location.href = "/login";
+    }
+
+    if (status === 403) {
+      window.location.href = "/";
+
+      toast.error("This page is not accessible or Blocked.");
     }
 
     return Promise.reject(error);

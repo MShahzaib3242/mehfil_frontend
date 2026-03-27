@@ -66,6 +66,16 @@ function ProfileDropdown() {
             </button>
 
             <button
+              onClick={() => {
+                navigate("/security");
+                setOpen(false);
+              }}
+              className="w-full text-left p-2 text-sm hover:bg-gray-100 rounded-md"
+            >
+              Security
+            </button>
+
+            <button
               className="w-full text-left p-2 text-sm text-red-500 hover:bg-red-50 rounded-md"
               onClick={() => {
                 logout();

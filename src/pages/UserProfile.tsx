@@ -7,12 +7,26 @@ import MainLayout from "../layouts/MainLayout";
 import Loader from "../components/ui/Loader";
 import { motion } from "framer-motion";
 import PostCard from "../components/PostCard";
+import { useFollowers } from "../hooks/User/useFollowers";
+import { useFollowing } from "../hooks/User/useFollowing";
+import UserListModal from "../components/ui/UserListModal";
+import { useBlockUser } from "../hooks/User/useBlock";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 
 function UserProfile() {
   const { id } = useParams();
 
   const { data: user, isLoading } = useUserProfile(id!);
   const { data, isLoading: postsLoading } = useUserPosts(id!);
+  const { data: followers = [] } = useFollowers(id!);
+  const { data: following = [] } = useFollowing(id!);
+  const { mutate: blockUserMutate } = useBlockUser();
+
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+
+  const [activeTab, setActiveTab] = React.useState<
+    "followers" | "following" | null
+  >(null);
 
   const { mutate: toggleFollow, isPending } = useToggleFollow();
 
@@ -46,22 +60,31 @@ function UserProfile() {
                 className="w-20 h-20 rounded-lg object-cover"
               />
             </div>
-            <button
-              onClick={() =>
-                toggleFollow({
-                  userId: user._id,
-                  isFollowing: user.isFollowing,
-                })
-              }
-              disabled={isPending}
-              className={`px-4 py-2 text-sm rounded-lg ${
-                user.isFollowing
-                  ? "bg-mehfil-primary text-white"
-                  : "border border-mehfil-primary text-mehfil-primary"
-              }`}
-            >
-              {user.isFollowing ? "Following" : "Follow"}
-            </button>
+            <div className="flex items-cener gap-4">
+              <button
+                onClick={() =>
+                  toggleFollow({
+                    userId: user._id,
+                    isFollowing: user.isFollowing,
+                  })
+                }
+                disabled={isPending}
+                className={`px-4 py-2 text-sm rounded-lg ${
+                  user.isFollowing
+                    ? "bg-mehfil-primary text-white"
+                    : "border border-mehfil-primary text-mehfil-primary"
+                }`}
+              >
+                {user.isFollowing ? "Following" : "Follow"}
+              </button>
+              <button
+                onClick={() => setConfirmOpen(true)}
+                disabled={isPending}
+                className={`${user.isBlocked ? "bg-red-500 text-white" : "border border-red-500 text-red-500 hover:bg-red-600 hover:text-white"} rounded-lg px-4 py-2 text-sm `}
+              >
+                {user.isBlocked ? "Unblock" : "Block"}
+              </button>
+            </div>
           </div>
 
           <div className="mt-4">
@@ -78,12 +101,20 @@ function UserProfile() {
               <span className="font-semibold">{data?.length || 0}</span>
               <span className="text-gray-500 ml-1">Posts</span>
             </div>
-            <div>
-              <span className="font-semibold">{user.followersCount || 0}</span>
+
+            <div
+              className="cursor-pointer"
+              onClick={() => setActiveTab("followers")}
+            >
+              <span className="font-semibold">{followers?.length || 0}</span>
               <span className="text-gray-500 ml-1">Followers</span>
             </div>
-            <div>
-              <span className="font-semibold">{user.followingCount || 0}</span>
+
+            <div
+              className="cursor-pointer"
+              onClick={() => setActiveTab("following")}
+            >
+              <span className="font-semibold">{following.length || 0}</span>
               <span className="text-gray-500 ml-1">Following</span>
             </div>
           </div>
@@ -113,6 +144,37 @@ function UserProfile() {
           )}
         </div>
       </div>
+      <UserListModal
+        open={activeTab === "followers"}
+        onClose={() => setActiveTab(null)}
+        title="Followers"
+        data={followers}
+        type="followers"
+      />
+      <UserListModal
+        open={activeTab === "following"}
+        onClose={() => setActiveTab(null)}
+        title="Following"
+        data={following}
+        type="following"
+      />
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          blockUserMutate({
+            userId: user._id,
+            isBlocked: user.isBlocked,
+          });
+          setConfirmOpen(false);
+        }}
+        title={user.isBlocked ? "Unblock User" : "Block User?"}
+        description={
+          user.isBlocked
+            ? "They will be able to interact with you again."
+            : "You won't see each other on the platform."
+        }
+      />
     </MainLayout>
   );
 }

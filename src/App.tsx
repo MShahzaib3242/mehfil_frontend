@@ -8,6 +8,7 @@ import { useAuth } from "./context/AuthContext";
 import React from "react";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
+import Security from "./pages/Security";
 
 function App() {
   const { data } = useCurrentUser();
@@ -45,6 +46,14 @@ function App() {
           element={
             <ProtectedRoute>
               <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/security"
+          element={
+            <ProtectedRoute>
+              <Security />
             </ProtectedRoute>
           }
         />
