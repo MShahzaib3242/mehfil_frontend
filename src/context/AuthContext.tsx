@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext } from "react";
 
 type User = {
   _id: string;
@@ -16,13 +16,16 @@ type AuthContextType = {
   logout: () => void;
   isAuthLoading: boolean;
   setAuthLoading: (val: boolean) => void;
+  isDeactivated: boolean;
+  setIsDeactivated: (val: boolean) => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: any) => {
-  const [user, setUser] = useState<User>(null);
-  const [isAuthLoading, setAuthLoading] = useState(true);
+  const [user, setUser] = React.useState<User>(null);
+  const [isAuthLoading, setAuthLoading] = React.useState(true);
+  const [isDeactivated, setIsDeactivated] = React.useState(false);
 
   const login = (token: string) => {
     localStorage.setItem("token", token);
@@ -35,7 +38,16 @@ export const AuthProvider = ({ children }: any) => {
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, login, logout, isAuthLoading, setAuthLoading }}
+      value={{
+        user,
+        setUser,
+        login,
+        logout,
+        isAuthLoading,
+        setAuthLoading,
+        isDeactivated,
+        setIsDeactivated,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -43,7 +55,7 @@ export const AuthProvider = ({ children }: any) => {
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = React.useContext(AuthContext);
   if (!context) {
     throw new Error("useAuth must be used inside AuthProvider");
   }

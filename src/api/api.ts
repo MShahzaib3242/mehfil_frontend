@@ -26,6 +26,10 @@ api.interceptors.response.use(
       window.location.href = "/login";
     }
 
+    if (error?.response?.data?.message === "ACCOUNT_DEACTIVATED") {
+      return Promise.reject(error);
+    }
+
     if (status === 403) {
       window.location.href = "/";
 

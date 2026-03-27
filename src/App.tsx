@@ -9,6 +9,7 @@ import React from "react";
 import Profile from "./pages/Profile";
 import UserProfile from "./pages/UserProfile";
 import Security from "./pages/Security";
+import DeactivatedModal from "./components/ui/DeactivatedModal";
 
 function App() {
   const { data } = useCurrentUser();
@@ -22,6 +23,8 @@ function App() {
 
   return (
     <BrowserRouter>
+      <DeactivatedModal />
+
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

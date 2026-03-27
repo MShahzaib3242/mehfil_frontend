@@ -26,6 +26,7 @@ function Login() {
   const navigate = useNavigate();
 
   const { mutate, isPending } = useLogin();
+  const [showDeactivatedModal, setShowDeactivatedModal] = React.useState(false);
 
   const {
     register,
@@ -44,19 +45,28 @@ function Login() {
   const onSubmit = (data: FormData) => {
     mutate(data, {
       onSuccess: async (res) => {
-        login(res.token);
-
         try {
+          login(res.token);
           const userData = await getCurrentUser();
 
           setUser(userData);
 
           navigate("/");
-        } catch (err) {
+        } catch (err: any) {
+          if (err?.response?.data?.message === "ACCOUNT_DEACTIVATED") {
+            setShowDeactivatedModal(true);
+            return;
+          }
+
           toast.error("Failed to load user");
         }
       },
       onError: (error: any) => {
+        console.log("error", error);
+        if (error?.response?.data?.message === "ACCOUNT_DEACTIVATED") {
+          setShowDeactivatedModal(true);
+          return;
+        }
         toast.error(getErrorMessage(error));
       },
     });
@@ -174,6 +184,24 @@ function Login() {
           />
         </motion.div>
       </div>
+      {showDeactivatedModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
+          <div className="bg-white rounded-xl p-6 w-[350px] text-center">
+            <h2 className="text-lg font-semibold mb-3">Account Deactivated</h2>
+
+            <p className="text-sm text-gray-500 mb-6">
+              Your account has been deactivated. Please contact support to
+              reactivate your account.
+            </p>
+            <button
+              onClick={() => setShowDeactivatedModal(false)}
+              className="bg-gray-200 px-4 py-2 rounded-md"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

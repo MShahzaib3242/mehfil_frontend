@@ -2,9 +2,14 @@ import React from "react";
 import MainLayout from "../layouts/MainLayout";
 import { motion } from "framer-motion";
 import BlockedUsersModal from "../components/BlockedUsersModal";
+import { useDeactivateAccount } from "../hooks/User/useDeactivateAccount";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 
 function Security() {
   const [openBlocked, setOpenBlocked] = React.useState(false);
+
+  const [confirmDeactivate, setConfirmDeactivate] = React.useState(false);
+  const { mutate: deactivate, isPending } = useDeactivateAccount();
 
   return (
     <MainLayout>
@@ -30,7 +35,10 @@ function Security() {
             >
               Blocked Users
             </button>
-            <button className="bg-red-500 text-white px-4 py-2 rounded-md text-sm hover:bg-red-500 hover:text-white">
+            <button
+              onClick={() => setConfirmDeactivate(true)}
+              className="bg-red-500 text-white px-4 py-2 rounded-md text-sm hover:bg-red-500 hover:text-white"
+            >
               Deactivate Account
             </button>
           </div>
@@ -39,6 +47,16 @@ function Security() {
       <BlockedUsersModal
         open={openBlocked}
         onClose={() => setOpenBlocked(false)}
+      />
+      <ConfirmDialog
+        open={confirmDeactivate}
+        onClose={() => setConfirmDeactivate(false)}
+        onConfirm={() => {
+          deactivate();
+          setConfirmDeactivate(false);
+        }}
+        title="Deactivate Account?"
+        description="Your account will be hidden and you will be logged out. This action can be reversed by contacting support."
       />
     </MainLayout>
   );
