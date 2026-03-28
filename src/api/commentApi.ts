@@ -21,3 +21,8 @@ export const updateComment = async (commentId: string, content: string) => {
   const res = await api.put(`/comments/comment/${commentId}`, { content });
   return res.data;
 };
+
+export const toggleCommentLike = async (commentId: string) => {
+  const res = await api.post(`/comments/${commentId}/like`);
+  return res.data;
+};

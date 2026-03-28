@@ -1,5 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deletePost, toggleLike, updatePost } from "../../api/postApi";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  deletePost,
+  getPostById,
+  toggleLike,
+  updatePost,
+} from "../../api/postApi";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
@@ -48,5 +53,13 @@ export const useUpdatePost = () => {
 
       queryClient.invalidateQueries({ queryKey: ["feed"] });
     },
+  });
+};
+
+export const useGetPost = (id: string) => {
+  return useQuery({
+    queryKey: ["post", id],
+    queryFn: () => getPostById(id),
+    enabled: !!id,
   });
 };

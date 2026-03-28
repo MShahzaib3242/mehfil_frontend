@@ -14,11 +14,14 @@ import { useFollowing } from "../hooks/User/useFollowing";
 import { useNavigate } from "react-router-dom";
 import UserListModal from "../components/ui/UserListModal";
 import { useToggleFollow } from "../hooks/Impressions/useToggleFollow";
+import { useRemoveFollower } from "../hooks/Impressions/useRemoveFollower";
+import ConfirmDialog from "../components/ui/ConfirmDialog";
 
 function Profile() {
   const navigate = useNavigate();
   const { user, setUser } = useAuth();
   const { mutate: toggleFollow } = useToggleFollow();
+  const { mutate: removeFollowerMutate } = useRemoveFollower();
   const [isEditing, setIsEditing] = React.useState(false);
   const { data, isLoading } = useUserPosts(user?._id);
   const { mutate, isPending } = useUpdateProfile();
@@ -26,6 +29,12 @@ function Profile() {
   const { data: following = [] } = useFollowing(user?._id || "");
   const [activeTab, setActiveTab] = React.useState<
     "followers" | "following" | null
+  >(null);
+
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [selectedUser, setSelectedUser] = React.useState<any>(null);
+  const [actionType, setActionType] = React.useState<
+    "remove" | "unfollow" | null
   >(null);
 
   const [form, setForm] = React.useState<{
@@ -278,23 +287,40 @@ function Profile() {
         type="followers"
         renderAction={(u) => {
           if (u._id === user?._id) return null;
-          console.log("ui", u.isFollowing);
+
           return (
-            <button
-              onClick={() =>
-                toggleFollow({
-                  userId: u._id,
-                  isFollowing: u.isFollowing,
-                })
-              }
-              className={`text-xs px-3 py-1 rounded-full ${
-                u.isFollowing
-                  ? "bg-mehfil-primary text-white"
-                  : "border border-mehfil-primary text-mehfil-primary hover:bg-mehfil-primary hover:text-white"
-              }`}
-            >
-              {u.isFollowing ? "Following" : "Follow"}
-            </button>
+            <div className="flex gap-2">
+              {/* Follow Back  */}
+              <button
+                onClick={() => {
+                  if (u.isFollowing) {
+                    setSelectedUser(u);
+                    setActionType("unfollow");
+                    setConfirmOpen(true);
+                  } else {
+                    toggleFollow({
+                      userId: u._id,
+                      isFollowing: u.isFollowing ? true : false,
+                    });
+                  }
+                }}
+                className={`text-xs px-3 py-1 rounded-full ${u.isFollowing ? "border border-mehfil-primary text-mehfil-primary hover:bg-mehfil-primary hover:text-white" : "bg-mehfil-primary text-white"}`}
+              >
+                {u.isFollowing ? "Unfollow" : "Follow Back"}
+              </button>
+
+              {/* Remove Follower  */}
+              <button
+                onClick={() => {
+                  setSelectedUser(u);
+                  setActionType("remove");
+                  setConfirmOpen(true);
+                }}
+                className="text-xs px-3 py-1 rounded-full border border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+              >
+                Remove
+              </button>
+            </div>
           );
         }}
       />
@@ -304,6 +330,48 @@ function Profile() {
         title="Following"
         data={following}
         type="following"
+        renderAction={(u) => {
+          if (u._id === user?._id) return null;
+          return (
+            <button
+              onClick={() => {
+                setSelectedUser(u);
+                setActionType("unfollow");
+                setConfirmOpen(true);
+              }}
+              className="text-xs px-3 py-1 rounded-full border border-gray-400 text-gray-600 hover:bg-gray-100"
+            >
+              Unfollow
+            </button>
+          );
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          if (!selectedUser) return;
+
+          if (actionType === "remove") {
+            removeFollowerMutate(selectedUser._id);
+          }
+
+          if (actionType === "unfollow") {
+            toggleFollow({
+              userId: selectedUser._id,
+              isFollowing: true,
+            });
+          }
+
+          setConfirmOpen(false);
+        }}
+        title={actionType === "remove" ? "Remove follower?" : "Unfollow user?"}
+        description={
+          actionType === "remove"
+            ? "This user will be removed from your followers."
+            : "You will stop seeing their posts."
+        }
       />
     </MainLayout>
   );

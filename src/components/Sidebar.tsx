@@ -3,10 +3,12 @@ import { Bell, Compass, Home, User } from "lucide-react";
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import ProfileDropdown from "./ProfileDropdown";
+import { useNotificationCount } from "../hooks/Notifications/useNotificationCount";
 
 function Sidebar() {
   // const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const count = useNotificationCount();
 
   return (
     <div className="flex flex-col h-screen">
@@ -26,7 +28,14 @@ function Sidebar() {
             route="/explore"
           />
           <NavItem
-            icon={<Bell size={18} />}
+            icon={
+              <div className="relative">
+                <Bell size={18} />
+                {count > 0 && (
+                  <span className="absolute -top-1 right-0 bg-red-500 w-2 h-2 rounded-full" />
+                )}
+              </div>
+            }
             label="Notifications"
             route="/notifications"
           />

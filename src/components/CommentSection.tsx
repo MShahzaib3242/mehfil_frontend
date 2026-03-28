@@ -4,9 +4,11 @@ import { useAddComment } from "../hooks/Impressions/useAddComment";
 import { AnimatePresence, motion } from "framer-motion";
 import { useDeleteComment } from "../hooks/Impressions/useDeleteComment";
 import { useUpdateComment } from "../hooks/Impressions/useUpdateComment";
-import { Pencil, Trash2 } from "lucide-react";
+import { Heart, Pencil, Trash2 } from "lucide-react";
 import ConfirmDialog from "./ui/ConfirmDialog";
 import { useAuth } from "../context/AuthContext";
+import { toggleCommentLike } from "../api/commentApi";
+import { useToggleCommentLike } from "../hooks/Impressions/useToggleCommentLike";
 
 function CommentSection({
   postId,
@@ -22,6 +24,7 @@ function CommentSection({
   const { mutate: addComment, isPending } = useAddComment();
   const { mutate: deleteCommentMutate } = useDeleteComment();
   const { mutate: updateCommentMutate } = useUpdateComment();
+  const { mutate: toggleCommentLikeMutate } = useToggleCommentLike();
 
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [editText, setEditText] = React.useState("");
@@ -137,6 +140,20 @@ function CommentSection({
                             <Trash2 size={14} className="text-red-500" />
                           </button>
                         )}
+
+                        <button
+                          onClick={() => toggleCommentLikeMutate(c._id)}
+                          className={`flex items-center gap-1 ${c.isLiked ? "text-red-500" : "hover:text-red-500"}`}
+                        >
+                          <Heart
+                            size={14}
+                            fill={c.isLiked ? "red" : "none"}
+                            className="transition-all duration-200"
+                          />
+                          {c.likesCount > 0 && (
+                            <span className="text-xs">{c.likesCount}</span>
+                          )}
+                        </button>
                       </div>
                     </div>
                   )}

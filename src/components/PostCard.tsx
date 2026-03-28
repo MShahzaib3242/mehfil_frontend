@@ -9,14 +9,15 @@ import toast from "react-hot-toast";
 import { useToggleLike } from "../hooks/Impressions/useToggleLike";
 import CommentSection from "./CommentSection";
 import { useNavigate } from "react-router-dom";
+import { timeAgo } from "../utils/timeAgo";
 
-function PostCard({ post }: any) {
+function PostCard({ post, defaultShowComments = false }: any) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [open, setOpen] = React.useState(false);
   const [isEditing, setIsEditing] = React.useState(false);
   const [showHeart, setShowHeart] = React.useState(false);
-  const [showComments, setShowComments] = React.useState(false);
+  const [showComments, setShowComments] = React.useState(defaultShowComments);
 
   const [content, setContent] = React.useState(post.content);
   const [showConfirm, setShowConfirm] = React.useState(false);
@@ -137,14 +138,19 @@ function PostCard({ post }: any) {
 
         {/* Post Content */}
         <div className="flex-1">
-          <div
-            className="flex items-center gap-2 text-sm mb-1 cursor-pointer"
-            onClick={() => navigate(`/user/${post?.author?._id}`)}
-          >
-            <span className="font-semibold hover:underline">
+          <div className="flex items-center gap-2 text-sm mb-1">
+            <span
+              className="font-semibold hover:underline cursor-pointer"
+              onClick={() => navigate(`/user/${post?.author?._id}`)}
+            >
               {post?.author?.username}
             </span>
-            <span className="text-gray-500">• 2h</span>
+            <span
+              className="text-gray-500 cursor-pointer hover:underline"
+              onClick={() => navigate(`/post/${post?._id}`)}
+            >
+              • {timeAgo(post?.createdAt)}
+            </span>
           </div>
 
           {isEditing ? (
@@ -270,7 +276,7 @@ function PostCard({ post }: any) {
             </span>
 
             <span
-              onClick={() => setShowComments((prev) => !prev)}
+              onClick={() => setShowComments((prev: boolean) => !prev)}
               className="flex items-center gap-1 hover:text-blue-500 cursor-pointer"
             >
               <MessageCircle size={16} /> {post.commentsCount || 0}

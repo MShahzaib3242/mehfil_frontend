@@ -7,7 +7,6 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { AuthProvider } from "./context/AuthContext.tsx";
 import { Toaster } from "react-hot-toast";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import DeactivatedModal from "./components/ui/DeactivatedModal.tsx";
 
 const queryClient = new QueryClient({
   defaultOptions: {

@@ -24,3 +24,8 @@ export const toggleLike = async (postId: string) => {
   const res = await api.post(`/posts/${postId}/like`);
   return res.data;
 };
+
+export const getPostById = async (id: string) => {
+  const res = await api.get(`/posts/${id}`);
+  return res.data;
+};
