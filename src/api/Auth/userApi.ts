@@ -26,3 +26,8 @@ export const changePassword = (data: {
 export const deactivateAccount = () => {
   return api.post("/users/deactivate");
 };
+
+export const getActiveUsers = async () => {
+  const res = await api.get("/users/active-users");
+  return res.data;
+};
