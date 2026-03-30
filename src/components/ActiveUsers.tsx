@@ -5,10 +5,12 @@ import { dummyImage } from "../utils/constants";
 import { timeAgo } from "../utils/timeAgo";
 import { useActiveUsersRealtime } from "../hooks/User/useActiveUsersRealtime";
 import Loader from "./ui/Loader";
+import { useChat } from "../context/ChatContext";
 
 function ActiveUsers() {
   const { data = [], isLoading } = useActiveUsers();
   const navigate = useNavigate();
+  const { openChat } = useChat();
 
   useActiveUsersRealtime();
 
@@ -29,7 +31,14 @@ function ActiveUsers() {
           <div
             key={u._id}
             className="flex items-center gap-3 cursor-pointer"
-            onClick={() => navigate(`/user/${u._id}`)}
+            onClick={() =>
+              openChat({
+                _id: u._id,
+                name: u.name,
+                username: u.username,
+                avatar: u.avatar,
+              })
+            }
           >
             <div className="relative">
               <img

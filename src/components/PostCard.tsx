@@ -19,11 +19,11 @@ function PostCard({ post, defaultShowComments = false }: any) {
   const [showHeart, setShowHeart] = React.useState(false);
   const [showComments, setShowComments] = React.useState(defaultShowComments);
 
-  const [content, setContent] = React.useState(post.content);
+  const [content, setContent] = React.useState(post?.content || "");
   const [showConfirm, setShowConfirm] = React.useState(false);
 
   const [existingImages, setExistingImages] = React.useState<string[]>(
-    post.images || [],
+    post?.images || [],
   );
   const [newImages, setNewImages] = React.useState<File[]>([]);
   const [newPreviews, setNewPreviews] = React.useState<string[]>([]);
@@ -32,11 +32,11 @@ function PostCard({ post, defaultShowComments = false }: any) {
   const { mutate: updateMutate, isPending: isUpdating } = useUpdatePost();
   const { mutate: toggleLikeMutate } = useToggleLike();
 
-  const isOwner = user?._id === post.author?._id;
+  const isOwner = user?._id === post?.author?._id;
 
   React.useEffect(() => {
-    setExistingImages(post.images || []);
-  }, [post.images]);
+    setExistingImages(post?.images || []);
+  }, [post?.images]);
 
   const handleEditStart = () => {
     setIsEditing(true);
