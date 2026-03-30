@@ -16,6 +16,7 @@ import UserListModal from "../components/ui/UserListModal";
 import { useToggleFollow } from "../hooks/Impressions/useToggleFollow";
 import { useRemoveFollower } from "../hooks/Impressions/useRemoveFollower";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
+import { dummyImage } from "../utils/constants";
 
 function Profile() {
   const navigate = useNavigate();
@@ -124,7 +125,7 @@ function Profile() {
           <div className="flex justify-between items-start">
             <div className="w-auto">
               <img
-                src={form.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
+                src={form.avatar || dummyImage}
                 alt="User Avatar"
                 className="w-20 h-20 rounded-lg object-cover"
               />

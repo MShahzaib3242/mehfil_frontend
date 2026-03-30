@@ -12,6 +12,7 @@ import { useFollowing } from "../hooks/User/useFollowing";
 import UserListModal from "../components/ui/UserListModal";
 import { useBlockUser } from "../hooks/User/useBlock";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
+import { dummyImage } from "../utils/constants";
 
 function UserProfile() {
   const { id } = useParams();
@@ -55,7 +56,7 @@ function UserProfile() {
           <div className="flex justify-between items-start">
             <div>
               <img
-                src={user.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
+                src={user.avatar || dummyImage}
                 alt=""
                 className="w-20 h-20 rounded-lg object-cover"
               />

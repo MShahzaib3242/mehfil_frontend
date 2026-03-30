@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useSuggestedUsers } from "../hooks/User/useSuggestedUsers";
 import { useToggleFollow } from "../hooks/Impressions/useToggleFollow";
 import { useNavigate } from "react-router-dom";
+import { dummyImage } from "../utils/constants";
 
 function SuggestedUsers() {
   const { data, isLoading } = useSuggestedUsers();
@@ -57,7 +58,7 @@ function SuggestedUsers() {
               onClick={() => navigate(`/user/${user._id}`)}
             >
               <img
-                src={user.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
+                src={user.avatar || dummyImage}
                 className="w-10 h-10 rounded-full object-cover"
               />
               <div className="flex flex-col">

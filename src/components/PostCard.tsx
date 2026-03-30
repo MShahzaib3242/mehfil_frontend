@@ -10,6 +10,7 @@ import { useToggleLike } from "../hooks/Impressions/useToggleLike";
 import CommentSection from "./CommentSection";
 import { useNavigate } from "react-router-dom";
 import { timeAgo } from "../utils/timeAgo";
+import { dummyImage } from "../utils/constants";
 
 function PostCard({ post, defaultShowComments = false }: any) {
   const navigate = useNavigate();
@@ -132,7 +133,7 @@ function PostCard({ post, defaultShowComments = false }: any) {
         {/* Avatar */}
         <img
           onClick={() => navigate(`/user/${post?.author?._id}`)}
-          src={post?.author?.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
+          src={post?.author?.avatar || dummyImage}
           className="w-9 h-9 rounded-full object-cover"
         />
 

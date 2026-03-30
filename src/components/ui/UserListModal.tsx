@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { dummyImage } from "../../utils/constants";
 
 type Props = {
   open: boolean;
@@ -66,9 +67,7 @@ function UserListModal({
                       onClick={() => navigate(`/user/${user?._id}`)}
                     >
                       <img
-                        src={
-                          user.avatar || import.meta.env.VITE_STATIC_IMAGE_URL
-                        }
+                        src={user.avatar || dummyImage}
                         alt=""
                         className="w-10 h-10 rounded-full object-cover"
                       />

@@ -1,3 +1,4 @@
 import { io } from "socket.io-client";
+import { socketUrl } from "./utils/constants";
 
-export const socket = io(import.meta.env.VITE_API_SOCKET_URL);
+export const socket = io(socketUrl);

@@ -2,6 +2,7 @@ import React from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import { dummyImage } from "../utils/constants";
 
 function ProfileDropdown() {
   const { user, logout } = useAuth();
@@ -30,7 +31,7 @@ function ProfileDropdown() {
         onClick={() => setOpen(!open)}
       >
         <img
-          src={user?.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
+          src={user?.avatar || dummyImage}
           className="w-10 h-10 rounded-full"
         />
         <div>

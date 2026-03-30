@@ -9,6 +9,7 @@ import ConfirmDialog from "./ui/ConfirmDialog";
 import { useAuth } from "../context/AuthContext";
 import { toggleCommentLike } from "../api/commentApi";
 import { useToggleCommentLike } from "../hooks/Impressions/useToggleCommentLike";
+import { dummyImage } from "../utils/constants";
 
 function CommentSection({
   postId,
@@ -72,9 +73,7 @@ function CommentSection({
                 className="flex gap-2 text-sm group"
               >
                 <img
-                  src={
-                    c.author?.avatar || import.meta.env.VITE_STATIC_IMAGE_URL
-                  }
+                  src={c.author?.avatar || dummyImage}
                   alt=""
                   className="w-7 h-7 rounded-full object-cover"
                 />

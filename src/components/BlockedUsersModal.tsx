@@ -4,6 +4,7 @@ import { useBlockUser } from "../hooks/User/useBlock";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import ConfirmDialog from "./ui/ConfirmDialog";
+import { dummyImage } from "../utils/constants";
 
 function BlockedUsersModal({ open, onClose }: any) {
   const navigate = useNavigate();
@@ -42,9 +43,7 @@ function BlockedUsersModal({ open, onClose }: any) {
                   onClick={() => navigate(`/user/${u.blocked._id}`)}
                 >
                   <img
-                    src={
-                      u.blocked.avatar || import.meta.env.VITE_STATIC_IMAGE_URL
-                    }
+                    src={u.blocked.avatar || dummyImage}
                     alt=""
                     className="w-10 h-10 rounded-full"
                   />

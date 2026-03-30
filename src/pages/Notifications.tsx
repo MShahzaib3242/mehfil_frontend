@@ -6,6 +6,7 @@ import Loader from "../components/ui/Loader";
 import MainLayout from "../layouts/MainLayout";
 import { useMarkNotification } from "../hooks/Notifications/useMarkNotification";
 import { CheckCheck } from "lucide-react";
+import { dummyImage } from "../utils/constants";
 
 function Notifications() {
   const navigate = useNavigate();
@@ -55,7 +56,7 @@ function Notifications() {
               className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition border bg-white hover:bg-gray-50 relative`}
             >
               <img
-                src={n.sender.avatar || import.meta.env.VITE_STATIC_IMAGE_URL}
+                src={n.sender.avatar || dummyImage}
                 alt=""
                 className="w-10 h-10 rounded-full object-cover"
               />
