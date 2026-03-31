@@ -32,12 +32,7 @@ function ActiveUsers() {
             key={u._id}
             className="flex items-center gap-3 cursor-pointer"
             onClick={() =>
-              openChat({
-                _id: u._id,
-                name: u.name,
-                username: u.username,
-                avatar: u.avatar,
-              })
+              openChat(u, location.pathname === "/inbox" ? "inbox" : "floating")
             }
           >
             <div className="relative">

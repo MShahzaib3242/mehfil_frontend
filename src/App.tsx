@@ -17,6 +17,7 @@ import Notifications from "./pages/Notifications";
 import PostDetails from "./pages/PostDetails";
 import { useNotifications } from "./hooks/Notifications/useNotifications";
 import ChatBox from "./components/chat/ChatBox";
+import Inbox from "./pages/Inbox";
 
 function App() {
   useRealTimeNotifications(); // Real time notifications via socket
@@ -91,6 +92,14 @@ function App() {
             }
           />
           <Route
+            path="/inbox"
+            element={
+              <ProtectedRoute>
+                <Inbox />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="/post/:id"
             element={
               <ProtectedRoute>
@@ -99,8 +108,9 @@ function App() {
             }
           />
         </Routes>
+
+        <ChatBox />
       </BrowserRouter>
-      <ChatBox />
     </>
   );
 }
