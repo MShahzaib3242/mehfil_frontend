@@ -21,6 +21,7 @@ type ChatContextType = {
   incrementUnread: (e: string) => void;
   clearUnread: (e: string) => void;
   totalUnreadConversations: number;
+  resetChat: () => void;
 };
 
 const ChatContext = React.createContext<ChatContextType | null>(null);
@@ -70,6 +71,8 @@ export const ChatProvider = ({ children }: any) => {
 
   const closeChat = () => {
     setIsOpen(false);
+    setActiveChat(null);
+    setMode("floating");
   };
 
   const incrementUnread = (userId: string) => {
@@ -86,6 +89,16 @@ export const ChatProvider = ({ children }: any) => {
     }));
   };
 
+  const resetChat = () => {
+    setActiveChat(null);
+    setIsOpen(false);
+    setIsMinimized(false);
+    setUnreadCounts({});
+    setMode("floating");
+
+    localStorage.removeItem("chat_state");
+  };
+
   return (
     <ChatContext.Provider
       value={{
@@ -100,6 +113,7 @@ export const ChatProvider = ({ children }: any) => {
         clearUnread,
         mode,
         totalUnreadConversations,
+        resetChat,
       }}
     >
       {children}

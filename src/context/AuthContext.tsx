@@ -1,4 +1,5 @@
 import React, { createContext } from "react";
+import { useChat } from "./ChatContext";
 
 type User = {
   _id: string;
@@ -29,6 +30,7 @@ export const AuthProvider = ({ children }: any) => {
   const [isAuthLoading, setAuthLoading] = React.useState(true);
   const [passwordUpdated, setPasswordUpdated] = React.useState(false);
   const [isDeactivated, setIsDeactivated] = React.useState(false);
+  // const { resetChat } = useChat();
 
   const login = (token: string) => {
     localStorage.setItem("token", token);
@@ -36,7 +38,11 @@ export const AuthProvider = ({ children }: any) => {
 
   const logout = () => {
     localStorage.removeItem("token");
+
+    // resetChat();
+
     setUser(null);
+    window.location.href = "/login";
   };
 
   return (

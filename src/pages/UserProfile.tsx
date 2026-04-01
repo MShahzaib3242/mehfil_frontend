@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useUserProfile } from "../hooks/User/useUserProfile";
 import { useUserPosts } from "../hooks/Posts/useUserPosts";
 import { useToggleFollow } from "../hooks/Impressions/useToggleFollow";
@@ -13,15 +13,21 @@ import UserListModal from "../components/ui/UserListModal";
 import { useBlockUser } from "../hooks/User/useBlock";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { dummyImage } from "../utils/constants";
+import { useChat } from "../context/ChatContext";
+import { useAuth } from "../context/AuthContext";
 
 function UserProfile() {
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const { data: user, isLoading } = useUserProfile(id!);
   const { data, isLoading: postsLoading } = useUserPosts(id!);
   const { data: followers = [] } = useFollowers(id!);
   const { data: following = [] } = useFollowing(id!);
   const { mutate: blockUserMutate } = useBlockUser();
+  const { openChat } = useChat();
+
+  const { user: currentUser } = useAuth();
 
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
@@ -30,6 +36,14 @@ function UserProfile() {
   >(null);
 
   const { mutate: toggleFollow, isPending } = useToggleFollow();
+
+  React.useEffect(() => {
+    if (id && currentUser?._id === id) {
+      navigate("/profile");
+    }
+  }, [id, currentUser]);
+
+  if (currentUser?._id === id) return null;
 
   if (isLoading) {
     return (
@@ -62,22 +76,39 @@ function UserProfile() {
               />
             </div>
             <div className="flex items-cener gap-4">
-              <button
-                onClick={() =>
-                  toggleFollow({
-                    userId: user._id,
-                    isFollowing: user.isFollowing,
-                  })
-                }
-                disabled={isPending}
-                className={`px-4 py-2 text-sm rounded-lg ${
-                  user.isFollowing
-                    ? "bg-mehfil-primary text-white"
-                    : "border border-mehfil-primary text-mehfil-primary"
-                }`}
-              >
-                {user.isFollowing ? "Following" : "Follow"}
-              </button>
+              {user.isFollowing && (
+                <button
+                  onClick={() =>
+                    openChat({
+                      _id: user._id,
+                      name: user.name,
+                      username: user.username,
+                      avatar: user.avatar,
+                    })
+                  }
+                  className="px-4 py-2 text-sm rounded-lg border border-mehfil-primary text-mehfil-primary hover:bg-mehfil-primary hover:text-white"
+                >
+                  Message
+                </button>
+              )}
+              {!user.isBlocked && (
+                <button
+                  onClick={() =>
+                    toggleFollow({
+                      userId: user._id,
+                      isFollowing: user.isFollowing,
+                    })
+                  }
+                  disabled={isPending}
+                  className={`px-4 py-2 text-sm rounded-lg ${
+                    user.isFollowing
+                      ? "bg-mehfil-primary text-white"
+                      : "border border-mehfil-primary text-mehfil-primary"
+                  }`}
+                >
+                  {user.isFollowing ? "Following" : "Follow"}
+                </button>
+              )}
               <button
                 onClick={() => setConfirmOpen(true)}
                 disabled={isPending}

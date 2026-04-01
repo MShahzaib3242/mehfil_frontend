@@ -18,6 +18,7 @@ import PostDetails from "./pages/PostDetails";
 import { useNotifications } from "./hooks/Notifications/useNotifications";
 import ChatBox from "./components/chat/ChatBox";
 import Inbox from "./pages/Inbox";
+import { useChat } from "./context/ChatContext";
 
 function App() {
   useRealTimeNotifications(); // Real time notifications via socket
@@ -25,6 +26,7 @@ function App() {
   const { data } = useCurrentUser();
   const { user, setUser } = useAuth();
   const token = localStorage.getItem("token");
+  const { resetChat } = useChat();
 
   React.useEffect(() => {
     if (data) {
@@ -35,6 +37,12 @@ function App() {
   React.useEffect(() => {
     if (user?._id && token) {
       socket.emit("register", user._id);
+    }
+  }, [user]);
+
+  React.useEffect(() => {
+    if (!user) {
+      resetChat();
     }
   }, [user]);
 
@@ -109,7 +117,7 @@ function App() {
           />
         </Routes>
 
-        <ChatBox />
+        {user && <ChatBox />}
       </BrowserRouter>
     </>
   );

@@ -6,7 +6,7 @@ import MainLayout from "../layouts/MainLayout";
 function Inbox() {
   return (
     <MainLayout>
-      <div className="h-screen flex bg-white rounded-xl border">
+      <div className="h-[calc(100vh-2rem)] flex bg-white rounded-xl border">
         {/* Left  */}
         <div className="w-[320px] border-r">
           <ConversationList />

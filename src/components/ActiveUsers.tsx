@@ -6,6 +6,7 @@ import { timeAgo } from "../utils/timeAgo";
 import { useActiveUsersRealtime } from "../hooks/User/useActiveUsersRealtime";
 import Loader from "./ui/Loader";
 import { useChat } from "../context/ChatContext";
+import ActiveUserDot from "./ui/ActiveUserDot";
 
 function ActiveUsers() {
   const { data = [], isLoading } = useActiveUsers();
@@ -44,7 +45,9 @@ function ActiveUsers() {
 
               {/* Online Dot  */}
               {u.isOnline && (
-                <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
+                <div className="absolute bottom-0 right-0">
+                  <ActiveUserDot />
+                </div>
               )}
             </div>
 

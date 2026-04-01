@@ -22,7 +22,10 @@ function Notifications() {
       <div className="max-w-full bg-white p-4 border border-gray-200 rounded-xl min-h-screen">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-semibold">Notifications</h2>
-          <button className="text-xs flex items-center gap-1 text-gray-500 hover:text-black">
+          <button
+            className="text-xs flex items-center gap-1 text-gray-500 hover:text-black"
+            onClick={() => markAll.mutate()}
+          >
             <CheckCheck size={14} /> Mark all as read
           </button>
         </div>
@@ -38,43 +41,48 @@ function Notifications() {
             </motion.div>
           )}
 
-          {data.map((n: any, index: number) => (
-            <motion.div
-              key={n._id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.03 }}
-              onClick={() => {
-                markOne.mutate(n._id);
+          {data.map(
+            (n: any, index: number) =>
+              n.sender && (
+                <motion.div
+                  key={n._id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.03 }}
+                  onClick={() => {
+                    markOne.mutate(n._id);
 
-                if (n.post) {
-                  navigate(`/post/${n.post}`);
-                } else {
-                  navigate(`/user/${n.sender._id}`);
-                }
-              }}
-              className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition border bg-white hover:bg-gray-50 relative`}
-            >
-              <img
-                src={n.sender.avatar || dummyImage}
-                alt=""
-                className="w-10 h-10 rounded-full object-cover"
-              />
+                    if (n.post) {
+                      navigate(`/post/${n.post}`);
+                    } else {
+                      navigate(`/user/${n.sender._id}`);
+                    }
+                  }}
+                  className={`flex items-center gap-3 p-3 rounded-xl cursor-pointer transition border bg-white hover:bg-gray-50 relative`}
+                >
+                  <img
+                    src={n.sender?.avatar || dummyImage}
+                    alt=""
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
 
-              <div className="flex-1 text-sm">
-                <span className="font-medium">{n.sender.name}</span>{" "}
-                {n.type === "follow" && "started following you"}
-                {n.type === "like" && "liked your post"}
-                {n.type === "comment" && "commented on your post"}
-                {n.type === "commentLike" && "liked your comment"}
-                <div className="text-xs text-gray-400 mt-1">
-                  {new Date(n.createdAt).toLocaleString()}
-                </div>
-              </div>
+                  <div className="flex-1 text-sm">
+                    <span className="font-medium">{n.sender?.name}</span>{" "}
+                    {n.type === "follow" && "started following you"}
+                    {n.type === "like" && "liked your post"}
+                    {n.type === "comment" && "commented on your post"}
+                    {n.type === "commentLike" && "liked your comment"}
+                    <div className="text-xs text-gray-400 mt-1">
+                      {new Date(n.createdAt).toLocaleString()}
+                    </div>
+                  </div>
 
-              {!n.read && <div className="w-2 h-2 bg-blue-500 rounded-full" />}
-            </motion.div>
-          ))}
+                  {!n.read && (
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                  )}
+                </motion.div>
+              ),
+          )}
         </div>
       </div>
     </MainLayout>

@@ -6,11 +6,28 @@ export const useBlockUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, isBlocked }: any) =>
-      isBlocked ? unblockUser(userId) : blockUser(userId),
+    mutationFn: ({
+      userId,
+      isBlocked,
+    }: {
+      userId: string;
+      isBlocked: boolean;
+    }) => {
+      return isBlocked ? unblockUser(userId) : blockUser(userId);
+    },
 
-    onSuccess: (_, { userId, isBlocked }) => {
-      toast.success(isBlocked ? "Unblocked" : "User Blocked ");
+    onSuccess: (_data, vars) => {
+      if (vars.isBlocked) {
+        toast.success("User Unblocked");
+      } else {
+        toast.success("User Blocked");
+      }
+    },
+
+    onMutate: async ({ userId, isBlocked }) => {
+      await queryClient.cancelQueries({ queryKey: ["userProfile", userId] });
+
+      const previous = queryClient.getQueryData(["userProfile", userId]);
 
       queryClient.setQueryData(["userProfile", userId], (old: any) => {
         if (!old) return old;
@@ -18,10 +35,23 @@ export const useBlockUser = () => {
         return {
           ...old,
           isBlocked: !isBlocked,
+          isFollowing: false,
         };
       });
 
-      queryClient.invalidateQueries({ queryKey: ["feed"] });
+      return { previous };
+    },
+
+    onError: (_err, vars, context) => {
+      queryClient.setQueryData(["userProfile", vars.userId], context?.previous);
+    },
+
+    onSettled: (_data, _err, vars) => {
+      queryClient.invalidateQueries({
+        queryKey: ["userProfile", vars.userId],
+      });
+      queryClient.invalidateQueries({ queryKey: ["followers"] });
+      queryClient.invalidateQueries({ queryKey: ["following"] });
     },
   });
 };
