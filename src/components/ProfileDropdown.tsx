@@ -4,7 +4,11 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { dummyImage } from "../utils/constants";
 
-function ProfileDropdown() {
+type ProfileDropDown = {
+  collapsed: boolean;
+};
+
+function ProfileDropdown({ collapsed }: ProfileDropDown) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -22,6 +26,8 @@ function ProfileDropdown() {
     return () => document.removeEventListener("mousedown", handleclickOutside);
   }, []);
 
+  console.log("collapsed", collapsed);
+
   return (
     <div className="relative" ref={ref}>
       {/* Avatar  */}
@@ -34,10 +40,12 @@ function ProfileDropdown() {
           src={user?.avatar || dummyImage}
           className="w-10 h-10 rounded-full"
         />
-        <div>
-          <p className="text-sm font-semibold">{user?.name}</p>
-          <p className="text-gray-500 text-xs">@{user?.username}</p>
-        </div>
+        {!collapsed && (
+          <div>
+            <p className="text-sm font-semibold">{user?.name}</p>
+            <p className="text-gray-500 text-xs">@{user?.username}</p>
+          </div>
+        )}
       </div>
 
       {/* Dropdown  */}
