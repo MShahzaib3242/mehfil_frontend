@@ -12,34 +12,74 @@ export const useChatMessages = (activeChat: any) => {
     queryFn: () => getMessages(activeChat?._id),
     enabled: !!activeChat && !!user,
   });
-  const { openChat, incrementUnread, isMinimized, mode, isOpen } = useChat();
+  const {
+    openChat,
+    incrementUnread,
+    isMinimized,
+    mode,
+    isOpen,
+    messages,
+    setMessages,
+  } = useChat();
 
-  const [messages, setMessages] = React.useState<any[]>([]);
   const queryClient = useQueryClient();
 
   React.useEffect(() => {
-    if (activeChat?._id) {
-      setMessages(history || []);
-    }
-  }, [history, activeChat]);
+    setMessages([]);
+  }, [activeChat?._id]);
 
   React.useEffect(() => {
+    if (!activeChat?._id) return;
+    if (!history) return;
+
+    setMessages((prev: any) => {
+      const merged = [...history];
+
+      prev.forEach((m: any) => {
+        if (!merged.some((h: any) => h._id === m._id)) {
+          merged.push(m);
+        }
+      });
+
+      return merged;
+    });
+  }, [history, activeChat?._id]);
+  // React.useEffect(() => {
+  //   if (!history) return;
+
+  //   setMessages((prev) => {
+  //     const prevIds = prev.map((m) => m._id).join(",");
+  //     const newIds = history.map((m: any) => m._id).join(",");
+
+  //     if (prevIds === newIds) return prev;
+
+  //     return history;
+  //   });
+  // }, [history]);
+
+  React.useEffect(() => {
+    if (!user?._id) return;
+
     const handleMessage = (msg: any) => {
       const senderId =
         typeof msg.sender === "object" ? msg.sender._id : msg.sender;
-      const receiverId = msg.receiver;
+      const receiverId =
+        typeof msg.receiver === "object" ? msg.receiver._id : msg.receiver;
 
       if (
-        activeChat &&
+        activeChat?._id &&
         (senderId === activeChat._id || receiverId === activeChat._id)
       ) {
-        setMessages((prev) => [...prev, msg]);
+        setMessages((prev: any) => {
+          const exists = prev.some((m: any) => m._id === msg._id);
+
+          if (exists) return prev;
+
+          return [...prev, msg];
+        });
       }
 
       if (receiverId === user?._id) {
-        // if (isMinimized || activeChat?._id !== senderId) {
-        //   incrementUnread(senderId);
-        // }
         const isCurrentChatOpen =
           activeChat?._id === senderId && !isMinimized && isOpen;
 
@@ -57,12 +97,24 @@ export const useChatMessages = (activeChat: any) => {
         }
       }
 
+      if (
+        receiverId === user?._id &&
+        activeChat?._id === senderId &&
+        !isMinimized &&
+        isOpen
+      ) {
+        socket.emit("markSeen", {
+          userId: user._id,
+          chatUserId: senderId,
+        });
+      }
+
       queryClient.setQueryData(["conversations"], (old: any) => {
         if (!old) return old;
 
         const isSenderMe = senderId === user?._id;
 
-        const otherUser = isSenderMe ? activeChat : msg.sender;
+        const otherUser = isSenderMe ? { _id: receiverId } : msg.sender;
 
         if (!otherUser?._id) return old;
 
@@ -87,18 +139,13 @@ export const useChatMessages = (activeChat: any) => {
       });
     };
 
+    socket.off("newMessage");
     socket.on("newMessage", handleMessage);
 
     return () => {
       socket.off("newMessage", handleMessage);
     };
-  }, [user, activeChat]);
-
-  React.useEffect(() => {
-    if (history.length) {
-      setMessages(history);
-    }
-  }, [history]);
+  }, [user, activeChat?._id, isMinimized, isOpen, mode]);
 
   React.useEffect(() => {
     const handleError = (err: any) => {
@@ -111,6 +158,32 @@ export const useChatMessages = (activeChat: any) => {
 
     return () => {
       socket.off("messageError", handleError);
+    };
+  }, []);
+
+  React.useEffect(() => {
+    const handleSeen = ({ userId }: any) => {
+      setMessages((prev: any) =>
+        prev.map((m: any) => {
+          const senderId =
+            typeof m.sender === "object" ? m.sender._id : m.sender;
+
+          const receiverId =
+            typeof m.receiver === "object" ? m.receiver._id : m.receiver;
+
+          if (receiverId === userId && senderId === user?._id) {
+            return { ...m, seen: true };
+          }
+
+          return m;
+        }),
+      );
+    };
+
+    socket.on("messagesSeen", handleSeen);
+
+    return () => {
+      socket.off("messagesSeen", handleSeen);
     };
   }, []);
 

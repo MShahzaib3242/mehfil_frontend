@@ -22,6 +22,8 @@ type ChatContextType = {
   clearUnread: (e: string) => void;
   totalUnreadConversations: number;
   resetChat: () => void;
+  messages: any;
+  setMessages: any;
 };
 
 const ChatContext = React.createContext<ChatContextType | null>(null);
@@ -43,6 +45,8 @@ export const ChatProvider = ({ children }: any) => {
     const saved = localStorage.getItem(STORAGE_KEY);
     return saved ? JSON.parse(saved).isMinimized : false;
   });
+
+  const [messages, setMessages] = React.useState<any[]>([]);
 
   const [unreadCounts, setUnreadCounts] = React.useState<
     Record<string, number>
@@ -114,6 +118,8 @@ export const ChatProvider = ({ children }: any) => {
         mode,
         totalUnreadConversations,
         resetChat,
+        messages,
+        setMessages,
       }}
     >
       {children}

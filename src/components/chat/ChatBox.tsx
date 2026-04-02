@@ -24,6 +24,7 @@ function ChatBox() {
     unreadCounts,
     mode,
     openChat,
+    messages,
   } = useChat();
   const { user } = useAuth();
   if (!user) return null;
@@ -34,7 +35,7 @@ function ChatBox() {
   const bottomRef = React.useRef<HTMLDivElement | null>(null);
 
   const [text, setText] = React.useState("");
-  const { messages, isLoading } = useChatMessages(activeChat);
+  const { isLoading } = useChatMessages(activeChat);
 
   const [isTyping, setIsTyping] = React.useState(false);
 
@@ -71,6 +72,17 @@ function ChatBox() {
   const sortedMessages = [...messages].sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
   );
+
+  React.useEffect(() => {
+    if (!activeChat?._id || !user?._id) return;
+
+    if (!isOpen || isMinimized) return;
+
+    socket.emit("markSeen", {
+      userId: user._id,
+      chatUserId: activeChat._id,
+    });
+  }, [activeChat, isMinimized, isOpen]);
 
   if (isLoading) {
     return <div className="p-3 text-gray-400">Loading...</div>;
@@ -162,7 +174,7 @@ function ChatBox() {
                           sender: user?._id,
                           receiver: activeChat._id,
                         });
-                      }, 5000);
+                      }, 2000);
                     }}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {

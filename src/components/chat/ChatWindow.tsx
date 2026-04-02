@@ -16,11 +16,11 @@ import { useBlockStatus } from "../../hooks/User/useBlockStatus";
 
 function ChatWindow() {
   const navigate = useNavigate();
-  const { activeChat, clearUnread } = useChat();
+  const { activeChat, clearUnread, messages, isOpen, isMinimized } = useChat();
   const { user } = useAuth();
   const { data: users = [] } = useActiveUsers();
 
-  const { messages, isLoading } = useChatMessages(activeChat);
+  // const { messages, isLoading } = useChatMessages(activeChat);
   const deleteConv = useDeleteConversation();
   const [confirmOpen, setConfirmOpen] = React.useState(false);
 
@@ -74,6 +74,17 @@ function ChatWindow() {
     }
   }, [activeChat]);
 
+  React.useEffect(() => {
+    if (!activeChat?._id || !user?._id) return;
+
+    if (!isOpen || isMinimized) return;
+
+    socket.emit("markSeen", {
+      userId: user._id,
+      chatUserId: activeChat._id,
+    });
+  }, [activeChat, isMinimized, isOpen]);
+
   if (!activeChat) {
     return (
       <div className="h-full flex items-center justify-center text-gray-400">
@@ -86,11 +97,9 @@ function ChatWindow() {
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
   );
 
-  if (isLoading) {
-    return <div className="p-4 text-gray-400">Loading...</div>;
-  }
-
-  console.log("block Data", blockData);
+  // if (isLoading) {
+  //   return <div className="p-4 text-gray-400">Loading...</div>;
+  // }
 
   return (
     <div className="h-full flex flex-col">
