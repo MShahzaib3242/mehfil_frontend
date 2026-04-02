@@ -15,6 +15,7 @@ import ConfirmDialog from "../components/ui/ConfirmDialog";
 import { dummyImage } from "../utils/constants";
 import { useChat } from "../context/ChatContext";
 import { useAuth } from "../context/AuthContext";
+import { timeAgo } from "../utils/timeAgo";
 
 function UserProfile() {
   const { id } = useParams();
@@ -50,6 +51,30 @@ function UserProfile() {
       <MainLayout>
         <div className="flex justify-center p-10">
           <Loader />
+        </div>
+      </MainLayout>
+    );
+  }
+
+  if (user?.isBlockedByOther) {
+    return (
+      <MainLayout>
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white border rounded-xl p-6 mt-6 text-center">
+            <img
+              src={user.avatar || dummyImage}
+              alt=""
+              className="w-20 h-20 rounded-lg mx-auto mb-4"
+            />
+
+            <h2 className="text-xl font-semibold">{user.name}</h2>
+            <p className="text-gray-500 text-sm">@{user.username}</p>
+
+            <p className="mt-4 text-sm text-gray-500">
+              This user blocked you
+              {user.blockedAt && <> on {timeAgo(user.blockedAt)}</>}
+            </p>
+          </div>
         </div>
       </MainLayout>
     );
