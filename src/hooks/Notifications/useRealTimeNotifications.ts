@@ -8,8 +8,6 @@ export const useRealTimeNotifications = () => {
 
   React.useEffect(() => {
     const handler = (data: any) => {
-      console.log("Notification received:", data);
-
       toast.success(getMessage(data));
       queryClient.setQueryData(["notifications"], (old: any) => {
         if (!old) return [data];

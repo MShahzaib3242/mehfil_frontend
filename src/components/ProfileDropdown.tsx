@@ -26,8 +26,6 @@ function ProfileDropdown({ collapsed }: ProfileDropDown) {
     return () => document.removeEventListener("mousedown", handleclickOutside);
   }, []);
 
-  console.log("collapsed", collapsed);
-
   return (
     <div className="relative" ref={ref}>
       {/* Avatar  */}
