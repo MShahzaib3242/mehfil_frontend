@@ -19,6 +19,8 @@ function PostCard({ post, defaultShowComments = false }: any) {
   const [isEditing, setIsEditing] = React.useState(false);
   const [showHeart, setShowHeart] = React.useState(false);
   const [showComments, setShowComments] = React.useState(defaultShowComments);
+  const [viewerOpen, setViewerOpen] = React.useState(false);
+  const [activeIndex, setActiveIndex] = React.useState(0);
 
   const [content, setContent] = React.useState(post?.content || "");
   const [showConfirm, setShowConfirm] = React.useState(false);
@@ -90,6 +92,22 @@ function PostCard({ post, defaultShowComments = false }: any) {
       },
     );
   };
+
+  React.useEffect(() => {
+    if (!viewerOpen) return;
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setViewerOpen(false);
+      if (e.key === "ArrowRight")
+        setActiveIndex((prev) => Math.min(prev + 1, existingImages.length - 1));
+      if (e.key === "ArrowLeft")
+        setActiveIndex((prev) => Math.max(prev - 1, 0));
+    };
+
+    window.addEventListener("keydown", handleKey);
+
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [viewerOpen, existingImages.length]);
 
   return (
     <>
@@ -191,7 +209,11 @@ function PostCard({ post, defaultShowComments = false }: any) {
                 <div key={i} className="relative">
                   <img
                     src={img}
-                    className={` rounded-lg object-cover ${isEditing ? "h-20 w-20" : "h-auto w-full"}`}
+                    className={`cursor-pointer rounded-lg object-cover ${isEditing ? "h-20 w-20" : "h-auto w-full"}`}
+                    onClick={() => {
+                      setActiveIndex(i);
+                      setViewerOpen(true);
+                    }}
                   />
                   {isEditing && (
                     <button
@@ -207,6 +229,57 @@ function PostCard({ post, defaultShowComments = false }: any) {
                   )}
                 </div>
               ))}
+            </div>
+          )}
+
+          {viewerOpen && (
+            <div
+              className="fixed inset-0 z-50 bg-black/90 flex items-center justify-center"
+              onClick={() => setViewerOpen(false)}
+            >
+              <button
+                onClick={() => setViewerOpen(false)}
+                className="absolute top-4 right-4 text-white text-2xl"
+              >
+                x
+              </button>
+
+              {activeIndex > 0 && (
+                <button
+                  className="absolute left-4 text-white text-3xl"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveIndex((prev) => prev - 1);
+                  }}
+                >
+                  {"<"}
+                </button>
+              )}
+
+              <AnimatePresence mode="wait">
+                <motion.img
+                  key={activeIndex}
+                  src={existingImages[activeIndex]}
+                  initial={{ x: 100, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ x: -100, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="max-h-[90%] max-w-[90%] object-contain rounded-lg"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </AnimatePresence>
+
+              {activeIndex < existingImages.length - 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveIndex((prev) => prev + 1);
+                  }}
+                  className="absolute right-4 text-white text-3xl"
+                >
+                  {">"}
+                </button>
+              )}
             </div>
           )}
 
